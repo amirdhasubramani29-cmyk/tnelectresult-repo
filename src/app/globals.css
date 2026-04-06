@@ -1,0 +1,285 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────
+   DARK MODE (default)
+───────────────────────────────────────── */
+:root {
+  --bg-primary:    #0a0e1a;
+  --bg-secondary:  #111827;
+  --bg-card:       #1a2235;
+  --bg-card-hover: #1e2a3d;
+  --card-bg:       #1a2235;
+  --border:        #2d3748;
+
+  --text-primary:   #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted:     #94a3b8;
+
+  --accent-blue:   #3b82f6;
+  --accent-purple: #8b5cf6;
+  --accent-teal:   #14b8a6;
+  --accent-yellow: #eab308;
+  --accent-green:  #22c55e;
+}
+
+/* ─────────────────────────────────────────
+   LIGHT MODE
+───────────────────────────────────────── */
+.light, html.light {
+  --bg-primary:    #f0f4f8;
+  --bg-secondary:  #ffffff;
+  --bg-card:       #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --card-bg:       #ffffff;
+  --border:        #e2e8f0;
+
+  --text-primary:   #0f172a;
+  --text-secondary: #1e293b;
+  --text-muted:     #64748b;
+
+  --accent-yellow: #b45309;
+  --accent-green:  #16a34a;
+}
+
+/* ─────────────────────────────────────────
+   RESET & BASE
+───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-inter, 'Inter'), var(--font-tamil, 'Noto Sans Tamil'), system-ui, sans-serif;
+  min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────
+   CARDS
+───────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  color: var(--text-primary);
+}
+
+.card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(59,130,246,0.15);
+}
+
+/* ─────────────────────────────────────────
+   GLASS EFFECT
+───────────────────────────────────────── */
+.glass {
+  background: rgba(26, 34, 53, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+.light .glass,
+html.light .glass {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* ─────────────────────────────────────────
+   GRADIENT TEXT
+───────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #14b8a6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─────────────────────────────────────────
+   BUTTONS
+───────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: #ffffff;
+}
+.btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.btn-ghost:hover,
+.btn-ghost.active {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* ─────────────────────────────────────────
+   INPUTS
+───────────────────────────────────────── */
+.input {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  padding: 10px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.input:focus { border-color: var(--accent-blue); }
+.input::placeholder { color: var(--text-muted); }
+select.input { cursor: pointer; }
+select.input option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────
+   BADGES
+───────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────
+   TABLE ROWS (theme-aware)
+───────────────────────────────────────── */
+.result-row {
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  color: var(--text-primary);
+}
+.result-row:hover { background: var(--bg-card-hover); }
+
+.result-row td { color: var(--text-primary); }
+.result-row .muted { color: var(--text-muted); }
+
+.table-head-row {
+  background: var(--bg-primary);
+}
+.table-head-row th {
+  color: var(--text-muted);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────
+   PROGRESS BARS
+───────────────────────────────────────── */
+.progress-track {
+  background: var(--bg-primary);
+  border-radius: 6px;
+  height: 10px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 1s ease;
+}
+
+/* ─────────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────────── */
+.animate-fade-in  { animation: fadeIn  0.5s ease both; }
+.animate-slide-up { animation: slideUp 0.4s ease both; }
+.animate-pulse-slow { animation: pulse 3s ease-in-out infinite; }
+
+@keyframes fadeIn  { from { opacity: 0; }                           to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse   { 0%,100% { opacity: 1; }  50% { opacity: 0.65; } }
+@keyframes ticker  { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+.ticker-scroll { animation: ticker 40s linear infinite; }
+
+/* ─────────────────────────────────────────
+   SCROLLBAR
+───────────────────────────────────────── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─────────────────────────────────────────
+   RESPONSIVE HELPERS
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hide-mobile { display: none !important; }
+  .mobile-full { width: 100% !important; }
+  .mobile-stack { flex-direction: column !important; }
+}
+
+/* ─────────────────────────────────────────
+   MAP TOOLTIP (Leaflet)
+───────────────────────────────────────── */
+.leaflet-tooltip.map-tooltip {
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid #2d3748;
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: #f1f5f9;
+  font-family: system-ui, sans-serif;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+.leaflet-tooltip:before { display: none; }
+.tooltip-title  { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.tooltip-party  { font-size: 12px; opacity: 0.85; }
+.map-tooltip    { max-width: 160px; white-space: nowrap; }
+
+/* ─────────────────────────────────────────
+   AD SLOT PLACEHOLDER
+───────────────────────────────────────── */
+.ad-slot {
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* desktop */
+@media (min-width: 768px) {
+  .district-layout {
+    grid-template-columns: minmax(0,1.2fr) minmax(0,1fr);
+  }
+}

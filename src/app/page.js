@@ -1,0 +1,135 @@
+'use client';
+import Link from 'next/link';
+import { useApp } from '@/context/AppContext';
+import { electionsDataen, getPartySummary, getPartyColor } from '@/data/elections';
+import { ArrowRight, BarChart2, MapPin, Globe, Zap } from 'lucide-react';
+
+const summary = getPartySummary(electionsDataen.constituencies);
+const topParties = summary.slice(0, 4);
+
+export default function HomePage() {
+  const { t, theme, lang } = useApp();
+
+  return (
+    <div style={{ minHeight: '80vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+
+      {/* ── Hero Section ──────────────────────── */}
+      <section style={{ padding: '60px 24px 40px', maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: '20px', padding: '6px 16px', marginBottom: '24px', fontSize: '13px', color: '#3b82f6', fontWeight: 600 }}>
+          <Zap size={14} /> {t('Election Data Platform', 'தேர்தல் தரவு தளம்')}
+        </div>
+
+        <h1 style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 900, lineHeight: 1.15, marginBottom: '16px', color: 'var(--text-primary)' }}>
+          {t('Tamil Nadu Election', 'தமிழ்நாடு தேர்தல்')}{' '}
+          <span style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            {t('Results Dashboard', 'முடிவுகள் தளம்')}
+          </span>
+        </h1>
+
+        <p style={{ fontSize: '17px', color: 'var(--text-secondary)', maxWidth: '580px', margin: '0 auto 32px', lineHeight: 1.7 }}>
+          {t(
+            'Explore detailed election results, party-wise analysis, district maps, and constituency-level insights for Tamil Nadu 2021.',
+            'தமிழ்நாடு 2021 தேர்தல் முடிவுகள், கட்சிவாரியான பகுப்பாய்வு, மாவட்ட வரைபடங்கள் மற்றும் தொகுதி அளவிலான நுண்ணறிவுகளை ஆராயுங்கள்.'
+          )}
+        </p>
+
+        {/* Quick party tally */}
+        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '36px' }}>
+          {topParties.map(({ party, seats }) => (
+            <div key={party} style={{ background: 'var(--bg-card)', border: `2px solid ${getPartyColor(party)}40`, borderRadius: '14px', padding: '12px 20px', minWidth: '90px', textAlign: 'center', transition: 'transform 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              <div style={{ fontSize: '30px', fontWeight: 900, color: getPartyColor(party) }}>{seats}</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600 }}>{party}</div>
+            </div>
+          ))}
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', padding: '12px 20px', minWidth: '90px', textAlign: 'center' }}>
+            <div style={{ fontSize: '30px', fontWeight: 900, color: 'var(--text-primary)' }}>234</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{t('Total', 'மொத்தம்')}</div>
+          </div>
+        </div>
+
+        <Link href="/tn/2021">
+          <button className="btn btn-primary" style={{ padding: '14px 32px', fontSize: '16px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            {t('View TN 2021 Results', 'தமிழ்நாடு 2021 முடிவுகளைப் பார்க்க')}
+            <ArrowRight size={18} />
+          </button>
+        </Link>
+      </section>
+
+      {/* ── Features Grid ────────────────────── */}
+      <section style={{ padding: '20px 24px 60px', maxWidth: '1100px', margin: '0 auto' }}>
+        <h2 style={{ textAlign: 'center', fontSize: '20px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '28px' }}>
+          {t("What's inside", 'இதில் என்ன உள்ளது')}
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '16px' }}>
+          {[
+            { icon: <BarChart2 size={22} color="#3b82f6" />, titleEn: 'Party Charts', titleTa: 'கட்சி வரைபடங்கள்', descEn: 'Pie & bar charts with seat distribution', descTa: 'இட விநியோகம் மற்றும் பட்டை வரைபடங்கள்' },
+            { icon: <MapPin size={22} color="#22c55e" />, titleEn: 'District Map', titleTa: 'மாவட்ட வரைபடம்', descEn: 'Interactive TN map with district drill-down', descTa: 'ஊடாடும் வரைபடம் மற்றும் மாவட்ட பகுப்பு' },
+            { icon: <Globe size={22} color="#8b5cf6" />, titleEn: 'Bilingual', titleTa: 'இரு மொழி ஆதரவு', descEn: 'Full Tamil & English language support', descTa: 'தமிழ் மற்றும் ஆங்கில மொழி ஆதரவு' },
+            { icon: <Zap size={22} color="#f59e0b" />, titleEn: 'Insights', titleTa: 'நுண்ணறிவுகள்', descEn: 'Biggest wins, closest races & more', descTa: 'மிகப்பெரிய வெற்றிகள், நெருக்கமான போட்டிகள்' },
+          ].map((f, i) => (
+            <div key={i} className="card" style={{ padding: '20px' }}>
+              <div style={{ marginBottom: '12px' }}>{f.icon}</div>
+              <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text-primary)', marginBottom: '6px' }}>
+                {lang === 'ta' ? f.titleTa : f.titleEn}
+              </div>
+              <div style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                {lang === 'ta' ? f.descTa : f.descEn}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Elections Grid ────────────────────── */}
+      <section style={{ padding: '0 24px 60px', maxWidth: '900px', margin: '0 auto' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '20px' }}>
+          🗳️ {t('Available Elections', 'கிடைக்கக்கூடிய தேர்தல்கள்')}
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+          {/* TN 2021 */}
+          <Link href="/tn/2021" style={{ textDecoration: 'none' }}>
+            <div className="card" style={{ padding: '22px', cursor: 'pointer', borderLeft: '4px solid #E31E24' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                <span style={{ fontSize: '24px' }}>🏛️</span>
+                <div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>{t('Tamil Nadu 2021', 'தமிழ்நாடு 2021')}</div>
+                  <div style={{ fontSize: '12px', color: '#22c55e', fontWeight: 600 }}>✓ {t('Results Available', 'முடிவுகள் கிடைக்கின்றன')}</div>
+                </div>
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '14px' }}>
+                {t('Assembly Election · 234 Constituencies', 'சட்டமன்றத் தேர்தல் · 234 தொகுதிகள்')}
+              </p>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {topParties.map(({ party, seats }) => (
+                  <span key={party} className="badge" style={{ background: `${getPartyColor(party)}18`, color: getPartyColor(party), border: `1px solid ${getPartyColor(party)}40` }}>
+                    {party} {seats}
+                  </span>
+                ))}
+              </div>
+              <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: '#3b82f6', fontSize: '13px', fontWeight: 600 }}>
+                {t('Explore Results', 'முடிவுகளை ஆராயுங்கள்')} <ArrowRight size={14} />
+              </div>
+            </div>
+          </Link>
+
+          {/* TN 2026 placeholder */}
+          <div className="card" style={{ padding: '22px', opacity: 0.6, cursor: 'not-allowed', borderLeft: '4px solid var(--border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <span style={{ fontSize: '24px' }}>🔮</span>
+              <div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>{t('Tamil Nadu 2026', 'தமிழ்நாடு 2026')}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>⏳ {t('Coming Soon', 'விரைவில்')}</div>
+              </div>
+            </div>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+              {t('Next Assembly Election · Results not yet available', 'அடுத்த சட்டமன்றத் தேர்தல் · முடிவுகள் இன்னும் இல்லை')}
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
