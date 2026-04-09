@@ -89,11 +89,31 @@ export default function Footer() {
 
 function FooterLink({ href, icon, label, accent }) {
   return (
-    <Link href={href} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: accent ? 'var(--accent-yellow)' : 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.2s' }}
-      onMouseEnter={e => e.currentTarget.style.color = accent ? 'var(--accent-yellow)' : 'var(--accent-blue)'}
-      onMouseLeave={e => e.currentTarget.style.color = accent ? 'var(--accent-yellow)' : 'var(--text-secondary)'}
-    >
-      {icon} {label}
+    <Link href={href} style={{ textDecoration: "none", display: "inline-block", width: "fit-content"   }}>
+      <span
+        style={{
+          display: "inline-flex", // 🔥 key
+          alignItems: "center",
+          gap: "6px",
+          fontSize: "13px",
+          color: accent ? "var(--accent-yellow)" : "var(--text-secondary)",
+          transition: "color 0.2s",
+          cursor: "pointer"
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = accent
+            ? "var(--accent-yellow)"
+            : "var(--accent-blue)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = accent
+            ? "var(--accent-yellow)"
+            : "var(--text-secondary)";
+        }}
+      >
+        {icon}
+        <span>{label}</span>
+      </span>
     </Link>
   );
 }

@@ -1,11 +1,26 @@
 'use client';
+import { useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { getPartyColor, getPartyName, partyFullNames } from '@/data/elections';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { X, TrendingUp, Users, Award, MapPin } from 'lucide-react';
 
 export default function ConstituencyModal() {
+	  
   const { selectedConstituency, setSelectedConstituency, t, lang } = useApp();
+  
+  useEffect(() => {
+    if (selectedConstituency) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [selectedConstituency]);
+
   if (!selectedConstituency) return null;
 
   const c = selectedConstituency;
@@ -26,10 +41,10 @@ export default function ConstituencyModal() {
 
   const constituencyName = (lang === 'ta' && c.name_ta) ? c.name_ta : c.name_en;
   const districtName     = (lang === 'ta' && c.district_ta) ? c.district_ta : c.district_en;
-
+  
   return (
     <div
-      style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', backdropFilter: 'blur(4px)' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', backdropFilter: 'blur(4px)' }}
       onClick={() => setSelectedConstituency(null)}
     >
       <div

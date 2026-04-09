@@ -80,7 +80,7 @@ export default function ResultsTable() {
         </h3>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
           {/* Search */}
-          <div style={{ position: 'relative' }}>
+          {/*<div style={{ position: 'relative' }}>
             <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input
               className="input"
@@ -89,7 +89,7 @@ export default function ResultsTable() {
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
-          </div>
+          </div>*/}
           {/* CSV Download */}
           {/*<button className="btn btn-ghost" style={{ padding: '7px 12px', fontSize: '13px' }} onClick={() => downloadCSV(electionsDataen.constituencies)}>
             <Download size={14} /> {t('CSV', 'CSV')}

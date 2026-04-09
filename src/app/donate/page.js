@@ -20,6 +20,25 @@ export default function DonatePage() {
     setDonated(true);
     setTimeout(() => setDonated(false), 4000);
   };
+  
+ const handleShare = async () => {
+  const shareText = t(
+    "Check out this TN Election Map!",
+    "இந்த TN தேர்தல் வரைபடத்தை பாருங்கள்!"
+  );
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "TN Election Map",
+        text: shareText,
+        url: window.location.href,
+      });
+    } catch (e) {}
+  } else {
+    copyLink();
+  }
+};
 
   return (
     <div style={{ minHeight: '80vh', background: 'var(--bg-primary)', color: 'var(--text-primary)', padding: '40px 20px' }}>
@@ -45,7 +64,7 @@ export default function DonatePage() {
           </div>
 
           {/* UPI Section */}
-          <div style={{ background: 'var(--bg-primary)', borderRadius: '14px', padding: '20px', marginBottom: '20px' }}>
+          {/*<div style={{ background: 'var(--bg-primary)', borderRadius: '14px', padding: '20px', marginBottom: '20px' }}>
             <p style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               {t('UPI Payment', 'UPI பணம் செலுத்துக')}
             </p>
@@ -62,7 +81,7 @@ export default function DonatePage() {
                 {copied ? <><Check size={15} /> {t('Copied!', 'நகலெடுக்கப்பட்டது!')}</> : <><Copy size={15} /> {t('Copy', 'நகலெடு')}</>}
               </button>
             </div>
-          </div>
+          </div>*/}
 
           {/* QR Code */}
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
@@ -79,6 +98,22 @@ export default function DonatePage() {
               />
             </div>
           </div>
+		  
+		  <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+  <p
+    style={{
+      fontWeight: 600,
+      fontSize: '14px',
+      color: 'var(--text-secondary)',
+      marginBottom: '12px',
+    }}
+  >
+    {t('Scan to Pay', 'ஸ்கேன் செய்து செலுத்துங்கள்')}
+  </p>
+
+  {/* 🔽 NEW SHARE SECTION */}
+  
+</div>
 
           {/* Confirm button */}
           <button
@@ -151,14 +186,80 @@ export default function DonatePage() {
             <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '12px' }}>
               {t('Other Ways to Help', 'உதவி செய்ய மற்ற வழிகள்')}
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px', color: 'var(--text-secondary)' }}>
-              <div>📢 {t('Share with friends & family', 'நண்பர்கள் மற்றும் குடும்பத்தினரிடம் பகிருங்கள்')}</div>
-              <div>💬 {t('Provide feedback to improve', 'மேம்படுத்த கருத்துக்களை தெரிவியுங்கள்')}</div>
-              <div>⭐ {t('Star us on GitHub (coming soon)', 'GitHub-ல் ஸ்டார் செய்யுங்கள் (விரைவில்)')}</div>
+           <div
+			  style={{
+				display: 'flex',
+				flexDirection: 'column',
+				gap: '8px', // slightly increased for breathing space
+			  }}
+			>
+			  {/* Share */}
+			  <div
+				style={{
+				  fontSize: '14px',
+				  color: 'var(--text-secondary)',
+				  display: 'flex',
+				  alignItems: 'center',
+				  gap: '8px',
+				}}
+			  >
+				<span>
+				  📢 {t('Share with friends & family', 'நண்பர்கள் மற்றும் குடும்பத்தினரிடம் பகிருங்கள்')}
+				</span>
+
+				<span
+				  onClick={handleShare}
+				  title="Share"
+				  style={{
+					cursor: 'pointer',
+					fontSize: '18px',
+					display: 'inline-flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					transition: 'transform 0.2s ease, opacity 0.2s ease',
+				  }}
+				  onMouseEnter={(e) => {
+					e.currentTarget.style.transform = 'scale(1.2)';
+					e.currentTarget.style.opacity = '0.8';
+				  }}
+				  onMouseLeave={(e) => {
+					e.currentTarget.style.transform = 'scale(1)';
+					e.currentTarget.style.opacity = '1';
+				  }}
+				>
+				  📤
+				</span>
+			  </div>
+
+			  {/* Feedback */}
+			  <div
+				style={{
+				  fontSize: '14px',
+				  color: 'var(--text-secondary)',
+				  display: 'flex',
+				  gap: '8px',
+				}}
+			  >
+				💬 {t('Provide feedback to improve (coming soon)', 'மேம்படுத்த கருத்துக்களை தெரிவியுங்கள் (விரைவில்)')}
+			  </div>
+
+			  {/* GitHub */}
+			  <div
+				style={{
+				  fontSize: '14px',
+				  color: 'var(--text-secondary)',
+				  display: 'flex',
+				  alignItems: 'center',
+				  gap: '8px',
+				}}
+			  >
+				⭐ {t('Star us on GitHub (coming soon)', 'GitHub-ல் ஸ்டார் செய்யுங்கள் (விரைவில்)')}
+			  </div>
+			</div>
+              
             </div>
           </div>
         </div>
       </div>
-    </div>
   );
 }

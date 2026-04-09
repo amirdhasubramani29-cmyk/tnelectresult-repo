@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const notoTamil = Noto_Sans_Tamil({ subsets: ["tamil"], variable: '--font-tamil', weight: ['400','500','600','700'] });
 
 export const metadata = {
-  title: "Tamil Nadu Election Results 2021 | தமிழ்நாடு தேர்தல் முடிவுகள் 2021",
+  title: "தமிழ்நாடு தேர்தல் முடிவுகள் | Tamil Nadu Election Results",
   description: "Comprehensive Tamil Nadu Assembly Election 2021 Results - All 234 constituencies with vote share, margins, and party-wise analysis.",
 };
 
