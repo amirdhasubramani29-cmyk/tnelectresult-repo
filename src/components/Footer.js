@@ -49,7 +49,7 @@ export default function Footer() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', color: 'var(--text-secondary)' }}>
               <div>🗳️ 234 {t('Constituencies', 'தொகுதிகள்')}</div>
               <div>🏛️ {t('Tamil Nadu Assembly 2021', 'தமிழ்நாடு சட்டமன்றம் 2021')}</div>
-              <div>📍 32 {t('Districts', 'மாவட்டங்கள்')}</div>
+              <div>📍 {t(' All Districts', ' அனைத்து மாவட்டங்கள்')}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <ExternalLink size={12} />
                 <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>

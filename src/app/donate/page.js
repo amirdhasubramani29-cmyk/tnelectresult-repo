@@ -1,14 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { Heart, Copy, Check, HeartHandshake, Star, Shield } from 'lucide-react';
 
-const UPI_ID = 'yourupi@bank'; // 🔴 Replace with real UPI ID
+const UPI_ID = 'yourupi@bank';
 
 export default function DonatePage() {
-  const { t } = useApp();
+  const { t, lang } = useApp();
   const [copied, setCopied] = useState(false);
   const [donated, setDonated] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(UPI_ID).catch(() => {});
@@ -19,26 +20,84 @@ export default function DonatePage() {
   const handleDonated = () => {
     setDonated(true);
     setTimeout(() => setDonated(false), 4000);
-  };
+  }; 
   
- const handleShare = async () => {
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+
+  const handleShare = async () => {
   const shareText = t(
-    "Check out this TN Election Map!",
-    "இந்த TN தேர்தல் வரைபடத்தை பாருங்கள்!"
+    "Check out this website for Tamil Nadu Election results!",
+    "இந்த தமிழ்நாடு சட்டமன்ற தேர்தல் முடிவுகள் பாருங்கள்!"
   );
 
   if (navigator.share) {
     try {
       await navigator.share({
-        title: "TN Election Map",
-        text: shareText,
-        url: window.location.href,
-      });
-    } catch (e) {}
+        title: "தமிழ்நாடு சட்டமன்ற தேர்தல் முடிவுகள் | Tamil Nadu Election results",
+		text: shareText,
+		url: SITE_URL,
+	  });
+	} catch (e) {}
   } else {
     copyLink();
-  }
-};
+  }};
+  
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  
+  const [submitted, setSubmitted] = useState(false);
+  
+   useEffect(() => {
+	if (showFeedback) {
+	  document.body.style.overflow = "hidden";
+	} else {
+	  document.body.style.overflow = "auto";
+	}
+
+	return () => {
+      document.body.style.overflow = "auto";
+	};
+  }, [showFeedback]);
+  
+  const submitFeedback = async () => {
+	setLoading(true);
+	try {
+		await fetch("/api/feedback", {
+			method: "POST",
+			headers: {
+			  "Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+			  message: feedback,
+			  date: new Date().toISOString(),
+			  lang: lang,
+			  
+			  referrer: document.referrer,
+
+			  userAgent: navigator.userAgent,
+              platform: navigator.platform,
+              screenSize: `${window.innerWidth}x${window.innerHeight}`,
+
+			  browserLang: navigator.language,
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+
+              connection: navigator.connection?.effectiveType || "unknown",
+			}),
+		});
+
+		setSubmitted(true);
+	} catch (e) {
+		console.error(e);
+	} finally {
+		setLoading(false);
+	}
+
+	setTimeout(() => {
+		setShowFeedback(false);
+		setSubmitted(false);
+		setFeedback("");
+	}, 2500);
+  };
 
   return (
     <div style={{ minHeight: '80vh', background: 'var(--bg-primary)', color: 'var(--text-primary)', padding: '40px 20px' }}>
@@ -100,20 +159,20 @@ export default function DonatePage() {
           </div>
 		  
 		  <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-  <p
-    style={{
-      fontWeight: 600,
-      fontSize: '14px',
-      color: 'var(--text-secondary)',
-      marginBottom: '12px',
-    }}
-  >
-    {t('Scan to Pay', 'ஸ்கேன் செய்து செலுத்துங்கள்')}
-  </p>
+			  <p
+				style={{
+				  fontWeight: 600,
+				  fontSize: '14px',
+				  color: 'var(--text-secondary)',
+				  marginBottom: '12px',
+				}}
+			  >
+				{t('Scan to Pay', 'ஸ்கேன் செய்து செலுத்துங்கள்')}
+			  </p>
 
-  {/* 🔽 NEW SHARE SECTION */}
-  
-</div>
+			  {/* 🔽 NEW SHARE SECTION */}
+			  
+			</div>
 
           {/* Confirm button */}
           <button
@@ -147,7 +206,7 @@ export default function DonatePage() {
                 [t('Free & Open', 'இலவசம் & திறந்தது'), t('Always free for public access', 'பொதுமக்களுக்கு எப்போதும் இலவசம்')],
                 [t('No Ads (Goal)', 'விளம்பரமில்லை (இலக்கு)'), t('Help us stay ad-free', 'விளம்பரமில்லாமல் வைக்க உதவுங்கள்')],
                 [t('All States 2026', 'அனைத்து மாநிலங்கள் 2026'), t('Expanding to more elections', 'மேலும் தேர்தல்களுக்கு விரிவாக்கம்')],
-                [t('Bilingual', 'இரு மொழி'), t('Tamil + English support for all', 'அனைவருக்கும் தமிழ் + ஆங்கிலம்')],
+                /*[t('Bilingual', 'இரு மொழி'), t('Tamil + English support for all', 'அனைவருக்கும் தமிழ் + ஆங்கிலம்')],*/
               ].map(([title, desc], i) => (
                 <li key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                   <span style={{ color: '#22c55e', marginTop: '2px', flexShrink: 0 }}>✓</span>
@@ -204,12 +263,12 @@ export default function DonatePage() {
 				}}
 			  >
 				<span>
-				  📢 {t('Share with friends & family', 'நண்பர்கள் மற்றும் குடும்பத்தினரிடம் பகிருங்கள்')}
+				  📢 {t('Share with friends & family', 'அனைவரும் அறிய பகிருங்கள்')}
 				</span>
 
 				<span
 				  onClick={handleShare}
-				  title="Share"
+				  title={t('Share', 'பகிருங்கள்')}
 				  style={{
 					cursor: 'pointer',
 					fontSize: '18px',
@@ -232,16 +291,131 @@ export default function DonatePage() {
 			  </div>
 
 			  {/* Feedback */}
-			  <div
-				style={{
-				  fontSize: '14px',
-				  color: 'var(--text-secondary)',
-				  display: 'flex',
-				  gap: '8px',
-				}}
-			  >
-				💬 {t('Provide feedback to improve (coming soon)', 'மேம்படுத்த கருத்துக்களை தெரிவியுங்கள் (விரைவில்)')}
-			  </div>
+			 <div
+				  style={{
+					fontSize: '14px',
+					color: 'var(--text-secondary)',
+					display: 'flex',
+					alignItems: 'center',
+					gap: '8px',
+				  }}
+				>
+				  <span>
+					💬 {t('Provide feedback', 'கருத்துக்களை தெரிவியுங்கள்')}
+				  </span>
+
+				  <span
+					onClick={() => setShowFeedback(true)}
+					title={t('Give Feedback', 'கருத்துக்களை தெரிவியுங்கள்')}
+					style={{
+					  cursor: 'pointer',
+					  fontSize: '18px',
+					  display: 'inline-flex',
+					  alignItems: 'center',
+					  transition: 'transform 0.2s ease',
+					}}
+					onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.2)')}
+					onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+				  >
+					✍️
+				  </span>
+				</div>
+				
+			  {/* ✅ ADD MODAL HERE (outside everything above) */}
+			  {showFeedback && (
+				<div>
+				  {showFeedback && (
+					  <div
+						style={{
+						  position: 'fixed',
+						  top: 0,
+						  left: 0,
+						  width: '100%',
+						  height: '100%',
+						  background: 'rgba(0,0,0,0.5)',
+						  display: 'flex',
+						  alignItems: 'center',
+						  justifyContent: 'center',
+						  zIndex: 1000,
+						}}
+					  >
+						<div
+						  style={{
+							background: '#fff',
+							padding: '20px',
+							borderRadius: '12px',
+							width: '90%',
+							maxWidth: '400px',
+						  }}
+						>
+						  {/* 🔥 THIS PART CHANGES */}
+						  {submitted ? (
+							<div style={{ textAlign: 'center' }}>
+							  <div style={{ fontSize: '28px', marginBottom: '10px' }}>✅</div>
+							  <p>
+								{t("Thanks for your feedback!", "உங்கள் கருத்துக்கு நன்றி!")}
+							  </p>
+							</div>
+						  ) : (
+							<>
+							  <h3 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px'}}>
+							    {t('Your Feedback', 'உங்கள் கருத்து')}</h3>
+
+							  <textarea
+								value={feedback}
+								onChange={(e) => setFeedback(e.target.value)}
+								maxLength={300}
+								style={{ 
+									width: '100%',
+									height: '140px',
+									padding: '12px',
+									borderRadius: '10px',
+									border: '1px solid var(--border)',
+									marginBottom: '8px',
+									fontSize: '14px',
+									resize: 'none',
+									outline: 'none' 
+								}}
+							  />
+
+							  <div style={{ textAlign: 'right', fontSize: '12px', color: feedback.length > 280 ? 'red' : 'var(--text-secondary)',
+								marginBottom: '10px', }}>
+								{feedback.length}/300
+							  </div>
+
+							  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+								<button className="btn btn-ghost" onClick={() => setShowFeedback(false)}>
+								  {t('Cancel', 'ரத்து')}
+								</button>
+
+								<button className="btn btn-primary" 
+								  onClick={submitFeedback}
+								  disabled={!feedback.trim() || loading}
+								  style={{
+									opacity: (!feedback.trim() || loading) ? 0.6 : 1,
+									cursor: (!feedback.trim() || loading) ? 'not-allowed' : 'pointer',
+									padding: '8px 14px',
+									borderRadius: '8px',
+								  }}
+								>
+								  {loading ? (
+									<span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+									  <span className="spinner" />
+									  {t('Submitting...', 'சமர்ப்பிக்கப்படுகிறது...')}
+									</span>
+								  ) : (
+									t('Submit', 'சமர்ப்பிக்கவும்')
+								  )}
+								</button>
+							  </div>
+							</>
+						  )}
+						</div>
+					  </div>
+					)}
+	
+				</div>
+			  )}
 
 			  {/* GitHub */}
 			  <div
