@@ -130,14 +130,11 @@ export default function ResultsTable() {
                   <td style={{ padding: '11px 16px', fontSize: '12px', color: 'var(--text-muted)' }}>{c.id}</td>
                   <td style={{ padding: '11px 16px' }}>
                     <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-primary)' }}>
-                      {lang === 'ta' && c.name_ta ? c.name_ta : c.name_en}
-                    </div>
-                    {lang === 'en' && c.name_ta && (
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{c.name_ta}</div>
-                    )}
+                      {c.name_en}
+                    </div>                    
                   </td>
                   <td style={{ padding: '11px 16px', fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-                    {lang === 'ta' && c.district_ta ? c.district_ta : c.district_en}
+                      {c.district_en}
                   </td>
                   <td style={{ padding: '11px 16px', fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>{c.winner}</td>
                   <td style={{ padding: '11px 16px' }}>

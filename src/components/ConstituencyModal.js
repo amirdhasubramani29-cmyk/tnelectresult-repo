@@ -38,9 +38,6 @@ export default function ConstituencyModal() {
 
   const margin   = c.margin || (winnerVotes - runnerVotes);
   const winShare = totalVotes > 0 ? ((winnerVotes / totalVotes) * 100).toFixed(1) : '0.0';
-
-  const constituencyName = (lang === 'ta' && c.name_ta) ? c.name_ta : c.name_en;
-  const districtName     = (lang === 'ta' && c.district_ta) ? c.district_ta : c.district_en;
   
   return (
     <div
@@ -55,9 +52,9 @@ export default function ConstituencyModal() {
         {/* Modal Header */}
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{constituencyName}</div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{c.name_en}</div>
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <MapPin size={13} /> {districtName} · Constituency #{c.id}
+              <MapPin size={13} /> {c.district_en} · Constituency #{c.id}
             </div>
           </div>
           <button

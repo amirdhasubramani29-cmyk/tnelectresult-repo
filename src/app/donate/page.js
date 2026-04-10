@@ -24,8 +24,8 @@ export default function DonatePage() {
   
   const handleShare = async () => {
   const shareText = t(
-    "Check out this website for Tamil Nadu Election results! ",
-    "இந்த தமிழ்நாடு சட்டமன்ற தேர்தல் முடிவுகள் பாருங்கள்! "
+    "Explore Tamil Nadu election results with constituency-wise data, party trends, and live status.",
+    "தமிழ்நாடு தேர்தல் முடிவுகளை தொகுதி வாரியாக, கட்சி நிலவரம் மற்றும் live தகவல்களுடன் பாருங்கள்."
   );
 
   if (navigator.share) {

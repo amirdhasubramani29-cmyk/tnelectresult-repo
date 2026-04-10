@@ -58,8 +58,8 @@ export function transformData(data, lang = 'en', districtMap = {}) {
   return data.constituencies.map(item => {
     if (!item) return null;
 
-	const districtKey = normalize(item.district_en); // ALWAYS EN
-    const partyKey    = item.party; // always EN key from EN data
+	const districtKey = normalize(item.district_en);
+    const partyKey    = item.party;
 	const districtDisplay = lang === 'ta' ? districtMap[districtKey] || item.district_en : item.district_en;
 	
     return {
