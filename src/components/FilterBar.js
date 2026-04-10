@@ -1,7 +1,7 @@
 'use client';
 import { useApp } from '@/context/AppContext';
 import { useEffect } from 'react';
-import { electionsDataen, electionsDatata, getPartyColor } from '@/data/elections';
+import { getPartyColor } from '@/data/elections';
 import { SortAsc } from 'lucide-react';
 
 // EN party keys that match the actual data

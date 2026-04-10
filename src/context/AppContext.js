@@ -9,6 +9,7 @@ export function AppProvider({ children }) {
   // ✅ DEFAULT (same as server)
   const [lang, setLang] = useState('ta');
   const [theme, setTheme] = useState('light');
+  const [year, setYear] = useState(2021);
   const [mounted, setMounted] = useState(false);
 
   const t = (en, ta) => (lang === 'ta' ? ta : en);
@@ -64,7 +65,8 @@ export function AppProvider({ children }) {
       filterParty, setFilterParty,
       sortBy, setSortBy,
       selectedConstituency, setSelectedConstituency,
-      t, mounted
+      t, mounted,
+	  year, setYear
     }}>
       {children}
     </AppContext.Provider>

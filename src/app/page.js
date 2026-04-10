@@ -1,14 +1,33 @@
 'use client';
 import Link from 'next/link';
 import { useApp } from '@/context/AppContext';
-import { electionsDataen, getPartySummary, getPartyColor } from '@/data/elections';
+import { useState, useEffect, useMemo } from 'react';
+import { getElectionData, getPartySummary, getPartyColor } from '@/data/elections';
 import { ArrowRight, BarChart2, MapPin, Globe, Zap } from 'lucide-react';
 
-const summary = getPartySummary(electionsDataen.constituencies);
-const topParties = summary.slice(0, 4);
-
 export default function HomePage() {
-  const { t, theme, lang } = useApp();
+  const { t, theme, year, lang } = useApp();
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    const loadData = async () => {
+      const result = await getElectionData(year, lang);
+      setData(result);
+    };
+
+    loadData();
+  }, [year, lang]);
+  
+  const { summary, topParties } = useMemo(() => {
+    if (!data?.constituencies) {
+		return { summary: [], topParties: [] };
+	}
+
+    const summary = getPartySummary(data.constituencies);
+	const topParties = summary.slice(0, 4);
+
+    return { summary, topParties };
+  }, [data, lang]);
 
   return (
     <div style={{ minHeight: '80vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>

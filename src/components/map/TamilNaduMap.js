@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
-import { partyColors } from "@/data/elections";
+import { partyColors, getGeoData } from "@/data/elections";
 import { normalize } from "@/utils/mapUtils";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -109,9 +109,11 @@ export default function TamilNaduMap({
 
 	// ✅ Fetch GeoJSON manually (more reliable)
 	useEffect(() => {
-		fetch("/tamilnadu_districts.json")
-		  .then((res) => res.json())
-		  .then((data) => setGeoData(data));
+		const load = async () => {
+		  const geo = await getGeoData();
+          setGeoData(geo);
+		};
+		load();
 	}, []);
 	
 	useEffect(() => {

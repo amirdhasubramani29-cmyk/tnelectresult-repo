@@ -1,10 +1,24 @@
 'use client';
 import { useApp } from '@/context/AppContext';
-import { electionsDataen, electionsDatata, getPartySummary, getPartyColor } from '@/data/elections';
+import { useState, useEffect } from 'react';
+import { getElectionData, getPartySummary, getPartyColor } from '@/data/elections';
 
 export default function ResultsHeader() {
-  const { t, lang } = useApp();
-  const summary = lang == 'ta' ? getPartySummary(electionsDatata.constituencies): getPartySummary(electionsDataen.constituencies);
+  
+  const { t, lang, year } = useApp();
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const result = await getElectionData(year, lang);
+      setData(result);
+    };
+    loadData();
+  }, [year, lang]);
+
+  if (!data) return null;
+
+  const summary = getPartySummary(data.constituencies);
   
   return (
     <div style={{

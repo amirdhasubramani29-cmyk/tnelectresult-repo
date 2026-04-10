@@ -12,13 +12,22 @@ const partyDisplayMap = {
   CPI:  { ta: 'கம்யூனிஸ்ட்',  en: 'CPI' },
 };
 
+export function formatDistrictName(name) {
+  if (!name) return "";
+
+  return name
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 /**
  * Build a map of district names → normalized key
  * Works from EN data only (more consistent)
  */
-export function buildDistrictMap(data_en) {
+export function buildDistrictMap(data) {
   const map = {};
-  data_en.forEach(item => {
+  data.forEach(item => {
     if (!item?.district_en) return;
     const key = normalize(item.district_en);
     map[item.district_en] = key;
@@ -45,8 +54,8 @@ export function buildDistrictTamilMap(data_ta) {
  * Transform EN constituency data for map/district display
  * Always use EN party keys as source of truth
  */
-export function transformData(data_en, lang = 'en', districtMap = {}) {
-  return data_en.map(item => {
+export function transformData(data, lang = 'en', districtMap = {}) {
+  return data.constituencies.map(item => {
     if (!item) return null;
 
 	const districtKey = normalize(item.district_en); // ALWAYS EN

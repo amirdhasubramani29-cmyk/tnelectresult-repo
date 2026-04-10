@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
-import { electionsDataen, electionsDatata, getPartyColor } from '@/data/elections';
+import { getElectionData, getPartyColor } from '@/data/elections';
 import { ChevronLeft, ChevronRight, Search, Download } from 'lucide-react';
 
 const PAGE_SIZE = 20;
@@ -22,15 +22,23 @@ function downloadCSV(data) {
 }
 
 export default function ResultsTable() {
-  const { t, lang, search, setSearch, filterParty, sortBy, setSelectedConstituency } = useApp();
+  const { t, lang, year, search, setSearch, filterParty, sortBy, setSelectedConstituency } = useApp();
   const [page, setPage] = useState(1);
-
-  // Always use EN data as source of truth (correct party keys)
-  const all = lang == 'ta' ? electionsDatata.constituencies || [] : electionsDataen.constituencies || [];
+  const [data, setData] = useState(null);
 
   // Reset page when filters change
   useEffect(() => { setPage(1); }, [search, filterParty, sortBy, lang]);
-
+  
+  useEffect(() => {
+	const loadData = async () => {
+		const result = await getElectionData(year, lang);
+		setData(result);
+	};
+	loadData();
+  }, [year, lang]);
+  
+  const all = data?.constituencies || [];
+  
   const filtered = useMemo(() => {
     let res = [...all];
     const q = search.toLowerCase().trim();
@@ -67,6 +75,8 @@ export default function ResultsTable() {
     t('Runner-up Votes', 'இரண்டாம்'),
     t('Margin', 'இடைவெளி'),
   ];
+  
+  if (!data) return <div>Loading...</div>;
 
   return (
     <div className="card" style={{ overflow: 'hidden' }}>
@@ -91,7 +101,7 @@ export default function ResultsTable() {
             />
           </div>*/}
           {/* CSV Download */}
-          {/*<button className="btn btn-ghost" style={{ padding: '7px 12px', fontSize: '13px' }} onClick={() => downloadCSV(electionsDataen.constituencies)}>
+          {/*<button className="btn btn-ghost" style={{ padding: '7px 12px', fontSize: '13px' }} onClick={() => downloadCSV(electionsData.constituencies)}>
             <Download size={14} /> {t('CSV', 'CSV')}
           </button>*/}
         </div>

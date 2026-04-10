@@ -1,6 +1,5 @@
 'use client';
 import { useApp } from '@/context/AppContext';
-import { useState } from 'react';
 import ResultsHeader from '@/components/ResultsHeader';
 import Dashboard from '@/components/Dashboard';
 import FilterBar from '@/components/FilterBar';
@@ -10,7 +9,7 @@ import ConstituencyModal from '@/components/ConstituencyModal';
 const TICKER_EN = [
   '🏆 DMK-led alliance wins majority with 159 seats',
   '🗳️ DMK wins 133 seats · ADMK wins 66 seats',
-  '🟢 M.K. Stalin sworn in as Chief Minister on May 7, 2021',
+  '🟢 M.K. Stalin sworn in as Chief Minister on May 7, 2026',
   '📊 BJP wins 4 seats · INC wins 18 seats · PMK wins 5 seats',
   '🗳️ Tamil Nadu voter turnout: 74.31%',
   '📍 234 constituencies · 38 districts',
@@ -19,16 +18,16 @@ const TICKER_EN = [
 const TICKER_TA = [
   '🏆 திமுக கூட்டணி 159 இடங்களுடன் பெரும்பான்மை',
   '🗳️ திமுக 133 இடங்கள் · அதிமுக 66 இடங்கள்',
-  '🟢 மு.க.ஸ்டாலின் மே 7, 2021 முதல்வராக பதவியேற்பு',
+  '🟢 மு.க.ஸ்டாலின் மே 7, 2026 முதல்வராக பதவியேற்பு',
   '📊 பாஜக 4 இடங்கள் · காங்கிரஸ் 18 இடங்கள் · பாமக 5 இடங்கள்',
   '🗳️ வாக்காளர் பங்கேற்பு: 74.31%',
   '📍 234 தொகுதிகள் · 38 மாவட்டங்கள்',
 ];
 
-export default function TN2021Page() {
+export default function TN2026Page() {
   const { t, lang } = useApp();
   const ticker = lang === 'ta' ? TICKER_TA : TICKER_EN;
- 
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
 

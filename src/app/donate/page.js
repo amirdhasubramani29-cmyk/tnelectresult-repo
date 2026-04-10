@@ -22,12 +22,10 @@ export default function DonatePage() {
     setTimeout(() => setDonated(false), 4000);
   }; 
   
-  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
-
   const handleShare = async () => {
   const shareText = t(
-    "Check out this website for Tamil Nadu Election results!",
-    "இந்த தமிழ்நாடு சட்டமன்ற தேர்தல் முடிவுகள் பாருங்கள்!"
+    "Check out this website for Tamil Nadu Election results! ",
+    "இந்த தமிழ்நாடு சட்டமன்ற தேர்தல் முடிவுகள் பாருங்கள்! "
   );
 
   if (navigator.share) {
@@ -35,12 +33,10 @@ export default function DonatePage() {
       await navigator.share({
         title: "தமிழ்நாடு சட்டமன்ற தேர்தல் முடிவுகள் | Tamil Nadu Election results",
 		text: shareText,
-		url: SITE_URL,
+		url: window.location.origin,
 	  });
 	} catch (e) {}
-  } else {
-    copyLink();
-  }};
+  }}
   
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -181,7 +177,7 @@ export default function DonatePage() {
             style={{ width: '100%', padding: '13px', fontSize: '15px', borderRadius: '12px' }}
           >
             <HeartHandshake size={18} />
-            {t("I've Donated — Thank You! 🙏", 'நான் ஆதரவு அளித்தேன் — நன்றி! 🙏')}
+            {t("I've Donated — Thank You! 🙏", 'நான் ஆதரவு அளித்தேன்! 🙏')}
           </button>
 
           {/* Thank-you message */}
@@ -194,51 +190,6 @@ export default function DonatePage() {
 
         {/* RIGHT — Why Support + Future Plans */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-          {/* Why support */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '22px' }}>
-            <h2 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Star size={17} color="var(--accent-yellow)" fill="var(--accent-yellow)" />
-              {t('Why Support Us?', 'ஏன் ஆதரிக்க வேண்டும்?')}
-            </h2>
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {[
-                [t('Free & Open', 'இலவசம் & திறந்தது'), t('Always free for public access', 'பொதுமக்களுக்கு எப்போதும் இலவசம்')],
-                [t('No Ads (Goal)', 'விளம்பரமில்லை (இலக்கு)'), t('Help us stay ad-free', 'விளம்பரமில்லாமல் வைக்க உதவுங்கள்')],
-                [t('All States 2026', 'அனைத்து மாநிலங்கள் 2026'), t('Expanding to more elections', 'மேலும் தேர்தல்களுக்கு விரிவாக்கம்')],
-                /*[t('Bilingual', 'இரு மொழி'), t('Tamil + English support for all', 'அனைவருக்கும் தமிழ் + ஆங்கிலம்')],*/
-              ].map(([title, desc], i) => (
-                <li key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                  <span style={{ color: '#22c55e', marginTop: '2px', flexShrink: 0 }}>✓</span>
-                  <div>
-                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{title}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{desc}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Future plans */}
-          <div style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1))', border: '1px solid rgba(59,130,246,0.25)', borderRadius: '16px', padding: '22px' }}>
-            <h2 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Shield size={17} color="#3b82f6" />
-              {t('Coming Soon', 'விரைவில் வருகிறது')}
-            </h2>
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {[
-                t('🗳️ Live election counting 2026', '🗳️ 2026 நேரடி வாக்கு எண்ணிக்கை'),
-                t('🗺️ All 29 Indian states', '🗺️ அனைத்து 29 இந்திய மாநிலங்களும்'),
-                t('📊 Candidate comparisons', '📊 வேட்பாளர் ஒப்பீடுகள்'),
-                t('📱 Mobile app', '📱 மொபைல் பயன்பாடு'),
-              ].map((item, i) => (
-                <li key={i} style={{ fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3b82f6', flexShrink: 0, display: 'inline-block' }} />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
 
           {/* Other ways section */}
           <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '22px' }}>
@@ -418,7 +369,7 @@ export default function DonatePage() {
 			  )}
 
 			  {/* GitHub */}
-			  <div
+			  {/*<div
 				style={{
 				  fontSize: '14px',
 				  color: 'var(--text-secondary)',
@@ -428,10 +379,55 @@ export default function DonatePage() {
 				}}
 			  >
 				⭐ {t('Star us on GitHub (coming soon)', 'GitHub-ல் ஸ்டார் செய்யுங்கள் (விரைவில்)')}
-			  </div>
+			  </div> */}
 			</div>
-              
-            </div>
+			</div>
+			
+			 {/* Why support */}
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '22px' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Star size={17} color="var(--accent-yellow)" fill="var(--accent-yellow)" />
+              {t('Why Support Us?', 'ஏன் ஆதரிக்க வேண்டும்?')}
+            </h2>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                [t('Free & Open', 'இலவசம் & திறந்தது'), t('Always free for public access', 'பொதுமக்களுக்கு எப்போதும் இலவசம்')],
+                [t('No Ads (Goal)', 'விளம்பரமில்லை (இலக்கு)'), t('Help us stay ad-free', 'விளம்பரமில்லாமல் வைக்க உதவுங்கள்')],
+                [t('All States 2026', 'அனைத்து மாநிலங்கள் 2026'), t('Expanding to more elections', 'மேலும் தேர்தல்களுக்கு விரிவாக்கம்')],
+                /*[t('Bilingual', 'இரு மொழி'), t('Tamil + English support for all', 'அனைவருக்கும் தமிழ் + ஆங்கிலம்')],*/
+              ].map(([title, desc], i) => (
+                <li key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                  <span style={{ color: '#22c55e', marginTop: '2px', flexShrink: 0 }}>✓</span>
+                  <div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{title}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{desc}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Future plans */}
+          <div style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1))', border: '1px solid rgba(59,130,246,0.25)', borderRadius: '16px', padding: '22px' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Shield size={17} color="#3b82f6" />
+              {t('Coming Soon', 'விரைவில் வருகிறது')}
+            </h2>
+            <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {[
+                t('🗳️ Live election counting 2026', '🗳️ 2026 நேரடி வாக்கு எண்ணிக்கை'),
+                t('🗺️ All Indian states', '🗺️ அனைத்து இந்திய மாநிலங்களும்'),
+                t('📊 Candidate comparisons', '📊 வேட்பாளர் ஒப்பீடுகள்'),
+                t('📱 Mobile app', '📱 மொபைல் பயன்பாடு'),
+              ].map((item, i) => (
+                <li key={i} style={{ fontSize: '14px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3b82f6', flexShrink: 0, display: 'inline-block' }} />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
           </div>
         </div>
       </div>

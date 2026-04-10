@@ -1,26 +1,68 @@
-import tn21dataen from "./tn_2021_results_en.json";
-import tn21datata from "./tn_2021_results_ta.json";
+const cache = new Map();
 
-export const electionsDataen = {
-  state_en: "Tamil Nadu",
-  state_ta: "தமிழ்நாடு",
-  year: 2021,
-  total_seats: 234,
-  majority_mark: 118,
-  status: "final",
-  last_updated: "2021-05-02",
-  constituencies: tn21dataen
+const loadTNData = async (year, lang) => {
+  try {
+    const data = await import(`@/data/${year}/tn_results_${lang}.json`);
+	//console.log('election.js loadTNdata ' + year + ' ' + lang);
+    return data.default;
+  } catch (e) {
+    console.error(`Data load error for year ${year} (${lang})`, e);
+    return null;
+  }
 };
 
-export const electionsDatata = {
-  state_en: "Tamil Nadu",
-  state_ta: "தமிழ்நாடு",
-  year: 2021,
-  total_seats: 234,
-  majority_mark: 118,
-  status: "final",
-  last_updated: "2021-05-02",
-  constituencies: tn21datata
+export const getElectionData = async (year, lang) => {
+  const key = `${year}-${lang}`;
+  if (cache.has(key)) {
+	//console.log('data get from cache. key: ' + key);
+    return cache.get(key); 
+  }
+
+  const promise = (async () => {
+	const constituencies = await loadTNData(year, lang);
+	return {
+		state_en: "Tamil Nadu",
+		state_ta: "தமிழ்நாடு",
+		year,
+		total_seats: 234,
+		majority_mark: 118,
+		status: "final",
+		last_updated: "2021-05-02",
+		constituencies,
+	};
+  })();
+  
+  cache.set(key, promise);
+
+  //console.log('data set into cache. key: ' + key);
+  return promise;
+};
+
+const geoCache = new Map();
+
+export const getGeoData = async () => {
+  const key = "tn-districts";
+  if (geoCache.has(key)) {
+    return geoCache.get(key);
+  }
+
+  const promise = (async () => {
+    try {
+      const res = await fetch("/tamilnadu_districts.json");
+      if (!res.ok) {
+        throw new Error("Failed to fetch geo data");
+      }
+
+      const data = await res.json();
+      return data;
+    } catch (e) {
+      console.error("Geo data error:", e);
+      return null;
+    }
+  })();
+
+  geoCache.set(key, promise);
+  return promise;
 };
 
 // ✅ Party color map — covers both EN & TA keys
@@ -87,10 +129,4 @@ export function getInsights(data) {
     closestRace:  constituenciesSorted[constituenciesSorted.length - 1],
     topParty:     getPartySummary(data.constituencies)[0]
   };
-}
-
-// 🔌 Data service — abstracted for future API/live support
-export async function fetchElectionData(state = "tn", year = 2021, lang = "en") {
-  // Currently returns static data; swap this with API call later
-  return lang === "ta" ? electionsDatata : electionsDataen;
 }

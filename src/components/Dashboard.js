@@ -1,71 +1,80 @@
 'use client';
+
 import { useApp } from '@/context/AppContext';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+
 import {
-  electionsDataen, electionsDatata,
-  getPartySummary, getPartyColor, getPartyName, getInsights, partyColors, partyFullNames
+  getElectionData,
+  getPartySummary,
+  getPartyColor,
+  getInsights,
+  getPartyName
 } from '@/data/elections';
+
+import TamilNaduMap from '@/components/map/TamilNaduMap';
+
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
   Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
-import TamilNaduMap from '@/components/map/TamilNaduMap';
-import data_en from '@/data/tn_2021_results_en.json';
-import data_ta from '@/data/tn_2021_results_ta.json';
-import { transformData, buildDistrictMap, buildDistrictTamilMap  } from '@/utils/dataAdapter';
-import { groupByDistrict, getDistrictPartyMap, normalize } from '@/utils/mapUtils';
+
+import {
+  transformData,
+  buildDistrictMap,
+  formatDistrictName
+} from '@/utils/dataAdapter';
+
+import {
+  groupByDistrict,
+  getDistrictPartyMap,
+  normalize
+} from '@/utils/mapUtils';
+
 import { Trophy, Swords, MapPin, TrendingUp, Users } from 'lucide-react';
 
 export default function Dashboard() {
-  const { t, lang } = useApp();
-  
-  // ✅ Tamil map for display
-  const districtMapTA = buildDistrictMap(data_ta);
-  const districtTamilMap = buildDistrictTamilMap(data_ta);
+  const { t, lang, year } = useApp();
+  const [data, setData] = useState(null);
 
-  const data = lang === 'ta' ? electionsDatata : electionsDataen;
+  useEffect(() => {
+    const loadData = async () => {
+      const result = await getElectionData(year, lang);
+      setData(result);
+    };
+
+    loadData();
+  }, [year, lang]);
+  
   const DEFAULT_DISTRICT = lang === 'ta' ? 'சென்னை' : 'chennai';
   const [selectedDistrict, setSelectedDistrict] = useState(DEFAULT_DISTRICT);
-
-  // Always use EN data for party summary (consistent party keys)
-  const summary = getPartySummary(lang === 'ta' ? electionsDatata.constituencies : electionsDataen.constituencies);
-  const insights = getInsights(lang === 'ta' ? electionsDatata : electionsDataen);
-
-  const dmkSeats  = summary.find(p => p.party === 'DMK' || 'திமுக')?.seats  || 0;
-  // DMK alliance: DMK + INC + VCK + CPI + CPM
-  const allianceSeats = summary.filter(p => ['DMK','INC','VCK','CPI','CPM','திமுக','காங்கிரஸ்'].includes(p.party))
-    .reduce((s, p) => s + p.seats, 0);
-  const admkSeats = summary.find(p => p.party === 'ADMK' || 'அதிமுக')?.seats || 0;
-
-  // Map data (optimized with useMemo)
-	const { districtMap, mapData, grouped, districtPartyMap } = useMemo(() => {
-	  const baseData = lang === 'ta' ? data_ta : data_en;;
-
-	  const districtMap = buildDistrictMap(data_ta);
-	  const mapData = transformData(baseData, lang, districtMapTA);
-	  
-	  const grouped = groupByDistrict(mapData);
-	  const districtPartyMap = getDistrictPartyMap(mapData);
-	  
-	  return { districtMap, mapData, grouped, districtPartyMap };
-	}, [lang]);
-
   const districtDisplayLookup = {};
   const partyDisplayLookup    = {};
-  mapData.forEach(item => {
-    districtDisplayLookup[item.districtKey] = item.districtDisplay;
-    partyDisplayLookup[item.party]          = item.partyDisplay;
-  });
-  
+
   useEffect(() => {
-		setSelectedDistrict(lang === 'ta' ? 'சென்னை' : 'chennai'); // normalized key
-	}, [lang]);
+    setSelectedDistrict(lang === 'ta' ? 'சென்னை' : 'chennai');
+  }, [lang]);
+  
+  const { districtMap, mapData, grouped, districtPartyMap } = useMemo(() => {
+    if (!data) return {};
 
+    const districtMap = buildDistrictMap(data.constituencies);
+    const mapData = transformData(data, lang, districtMap);
 
-  // District list for dropdown
-  const allDistricts = useMemo(() =>
-    Object.keys(grouped).sort(), [grouped]
-  );
+    const grouped = groupByDistrict(mapData);
+    const districtPartyMap = getDistrictPartyMap(mapData);
+	
+	mapData.forEach(item => {
+      districtDisplayLookup[item.districtKey] = item.districtDisplay;
+      partyDisplayLookup[item.party]          = item.partyDisplay;
+    });
+
+    return { districtMap, mapData, grouped, districtPartyMap };
+  }, [data, lang]);
+  
+  const allDistricts = useMemo(() => {
+    if (!grouped) return [];
+    return Object.keys(grouped).sort();
+  }, [grouped]);
 
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.length) return null;
@@ -77,6 +86,23 @@ export default function Dashboard() {
       </div>
     );
   };
+  
+  if (!data) return <div>Loading...</div>;
+
+  const summary = getPartySummary(data.constituencies);
+  const insights = getInsights(data);
+
+  const dmkSeats =
+    summary.find(p => ['DMK', 'திமுக'].includes(p.party))?.seats || 0;
+
+  const admkSeats =
+    summary.find(p => ['ADMK', 'அதிமுக'].includes(p.party))?.seats || 0;
+
+  const allianceSeats = summary
+    .filter(p =>
+      ['DMK', 'INC', 'VCK', 'CPI', 'CPM', 'திமுக', 'காங்கிரஸ்'].includes(p.party)
+    )
+    .reduce((s, p) => s + p.seats, 0);
 
   return (
     <div style={{ display: 'grid', gap: '24px' }}>
@@ -111,7 +137,7 @@ export default function Dashboard() {
           <h3 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '20px', color: 'var(--text-primary)' }}>
             {t('Party-wise Seat Distribution', 'கட்சிவாரியான இட விநியோகம்')}
           </h3>
-          <ResponsiveContainer width="100%" height={230}>
+          <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie data={summary} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={2} dataKey="seats" nameKey="party">
                 {summary.map((entry, i) => <Cell key={i} fill={getPartyColor(entry.party)} />)}
@@ -269,9 +295,8 @@ function InsightCard({ icon, title, body, sub, accent }) {
 
 function DistrictPanel({ selectedDistrict, grouped, districtDisplayLookup, t, lang }) {
   const constituenciesInDistrict = grouped[normalize(selectedDistrict)] || [];
-  const districtName = districtDisplayLookup[normalize(selectedDistrict)] ||
-	(lang === 'ta' ? selectedDistrict : selectedDistrict);
-
+  const districtName = formatDistrictName(selectedDistrict);
+  
   const partySummary = {};
   constituenciesInDistrict.forEach(c => {
     partySummary[c.party] = (partySummary[c.party] || 0) + 1;
