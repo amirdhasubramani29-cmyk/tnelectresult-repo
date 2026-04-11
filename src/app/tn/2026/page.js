@@ -1,5 +1,6 @@
 'use client';
 import { useApp } from '@/context/AppContext';
+import { useParams } from "next/navigation";
 import ResultsHeader from '@/components/ResultsHeader';
 import Dashboard from '@/components/Dashboard';
 import FilterBar from '@/components/FilterBar';
@@ -26,6 +27,8 @@ const TICKER_TA = [
 
 export default function TN2026Page() {
   const { t, lang } = useApp();
+  const year = 2026;
+  //console.log(year);
   const ticker = lang === 'ta' ? TICKER_TA : TICKER_EN;
 
   return (

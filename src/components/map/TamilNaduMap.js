@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
-import { partyColors, getGeoData } from "@/data/elections";
+import { partyColors, getGeoData, getPartyColor } from "@/data/elections";
 import { normalize } from "@/utils/mapUtils";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -89,6 +89,7 @@ export default function TamilNaduMap({
 	const getTooltipContent = useCallback(
 	  (rawName) => {
 		const key = normalize(rawName, lang);
+		const displayDistrict = lang === "en" ? key.charAt(0).toUpperCase() + key.slice(1) : key;
 		const partyKey = districtPartyMap?.[key];
 		const party = partyDisplayLookup?.[partyKey] || partyKey || "N/A";
 		const district = districtDisplayLookup?.[key] || rawName;
@@ -96,7 +97,7 @@ export default function TamilNaduMap({
 		return `
 		  <div class="map-tooltip">
 			<div class="tooltip-title">
-			  ${district}
+			  ${displayDistrict}
 			</div>
 			<div class="tooltip-party">
 			  ${party}
@@ -160,16 +161,21 @@ export default function TamilNaduMap({
 	});
 	
 	// ✨ Hover
-    layer.on({
+   layer.on({
 	  mouseover: () => {
 		layer.setStyle({
 		  weight: 3,
-		  fillOpacity: 1
+		  fillOpacity: 1,
 		});
 	  },
+
 	  mouseout: () => {
-		geoJsonRef.current?.resetStyle(layer);
-	  }
+		layer.setStyle({
+		  weight: 1,
+		  fillOpacity: 0.8,
+		  //fillColor: color,
+		});
+	  },
 	});
   };
 

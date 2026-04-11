@@ -245,6 +245,16 @@ select.input option {
   .mobile-stack { flex-direction: column !important; }
 }
 
+.hide-desktop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hide-desktop {
+    display: inline !important;
+  }
+}
+
 /* ─────────────────────────────────────────
    MAP TOOLTIP (Leaflet)
 ───────────────────────────────────────── */
@@ -298,3 +308,4 @@ select.input option {
     transform: rotate(360deg);
   }
 }
+

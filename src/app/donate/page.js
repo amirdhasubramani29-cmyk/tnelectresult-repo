@@ -154,7 +154,7 @@ export default function DonatePage() {
             </div>
           </div>
 		  
-		  <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+		  {/* <div style={{ textAlign: 'center', marginBottom: '24px' }}>
 			  <p
 				style={{
 				  fontWeight: 600,
@@ -166,9 +166,7 @@ export default function DonatePage() {
 				{t('Scan to Pay', 'ஸ்கேன் செய்து செலுத்துங்கள்')}
 			  </p>
 
-			  {/* 🔽 NEW SHARE SECTION */}
-			  
-			</div>
+				</div>*/}
 
           {/* Confirm button */}
           <button
@@ -192,7 +190,7 @@ export default function DonatePage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
           {/* Other ways section */}
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '22px' }}>
+          <div style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1))', border: '1px solid var(--border)', borderRadius: '16px', padding: '22px' }}>
             <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '12px' }}>
               {t('Other Ways to Help', 'உதவி செய்ய மற்ற வழிகள்')}
             </h2>
@@ -408,7 +406,7 @@ export default function DonatePage() {
           </div>
 
           {/* Future plans */}
-          <div style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.1))', border: '1px solid rgba(59,130,246,0.25)', borderRadius: '16px', padding: '22px' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(59,130,246,0.25)', borderRadius: '16px', padding: '22px' }}>
             <h2 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Shield size={17} color="#3b82f6" />
               {t('Coming Soon', 'விரைவில் வருகிறது')}

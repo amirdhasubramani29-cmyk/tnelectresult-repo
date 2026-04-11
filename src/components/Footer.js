@@ -24,7 +24,7 @@ export default function Footer() {
             <p style={{ color: 'var(--text-muted)', fontSize: '13px', lineHeight: 1.7 }}>
               {t(
                 'Independent election data platform for Tamil Nadu. Free, bilingual, and open to all.',
-                'தமிழ்நாட்டுக்கான சுதந்திர தேர்தல் தரவு தளம். இலவசம், இரு மொழி மற்றும் அனைவருக்கும் திறந்தது.'
+                'தமிழ்நாட்டுக்கான சுதந்திர தேர்தல் தரவு தளம். இலவசம், இரு மொழி மற்றும் அனைவருக்கும்.'
               )}
             </p>
           </div>

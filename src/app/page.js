@@ -71,7 +71,15 @@ export default function HomePage() {
 
         <Link href="/tn/2021">
           <button className="btn btn-primary" style={{ padding: '14px 32px', fontSize: '16px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            {t('View TN 2021 Results', 'தமிழ்நாடு 2021 முடிவுகளைப் பார்க்க')}
+            
+			<span className="hide-mobile">
+			  {t("View TN 2021 Results", "தமிழ்நாடு 2021 முடிவுகளைப் பார்க்க")}
+             </span>
+
+            <span className="hide-desktop">
+              {t("View TN 2021 Results", "2021 முடிவுகள்")}
+            </span>
+			
             <ArrowRight size={18} />
           </button>
         </Link>
