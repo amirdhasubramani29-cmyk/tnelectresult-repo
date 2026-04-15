@@ -1,33 +1,32 @@
 'use client';
 import { useApp } from '@/context/AppContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, notFound } from "next/navigation";
 import ResultsHeader from '@/components/ResultsHeader';
 import Dashboard from '@/components/Dashboard';
 import FilterBar from '@/components/FilterBar';
 import ResultsTable from '@/components/ResultsTable';
 import ConstituencyModal from '@/components/ConstituencyModal';
+import { ELECTION_CONFIG } from "@/config/electionConfig";
+import { TICKER_DATA } from "@/data/tickerData";
 
-const TICKER_EN = [
-  '🏆 DMK-led alliance wins majority with 159 seats',
-  '🗳️ DMK wins 133 seats · ADMK wins 66 seats',
-  '🟢 M.K. Stalin sworn in as Chief Minister on May 7, 2021',
-  '📊 BJP wins 4 seats · INC wins 18 seats · PMK wins 5 seats',
-  '🗳️ Tamil Nadu voter turnout: 74.31%',
-  '📍 234 constituencies · 38 districts',
-];
-
-const TICKER_TA = [
-  '🏆 திமுக கூட்டணி 159 இடங்களுடன் பெரும்பான்மை',
-  '🗳️ திமுக 133 இடங்கள் · அதிமுக 66 இடங்கள்',
-  '🟢 மு.க.ஸ்டாலின் மே 7, 2021 முதல்வராக பதவியேற்பு',
-  '📊 பாஜக 4 இடங்கள் · காங்கிரஸ் 18 இடங்கள் · பாமக 5 இடங்கள்',
-  '🗳️ வாக்காளர் பங்கேற்பு: 74.31%',
-  '📍 234 தொகுதிகள் · 38 மாவட்டங்கள்',
-];
-
-export default function TN2021Page() {
-  const { t, lang } = useApp();
-  const ticker = lang === 'ta' ? TICKER_TA : TICKER_EN;
+export default function TNPage() {
+  const { t, lang, year: currentYear, setYear } = useApp();
+  const params = useParams();
+  const routeYear = Number(params?.year);
+  
+  useEffect(() => {
+    if (routeYear) {
+      setYear(routeYear);
+    }
+  }, [routeYear]);
+  
+  const config = ELECTION_CONFIG[routeYear];
+  if (!config?.enabled) {
+    notFound();
+  }
+  
+  const ticker = TICKER_DATA?.[currentYear]?.[lang] || TICKER_DATA?.[currentYear]?.en || [];
  
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>

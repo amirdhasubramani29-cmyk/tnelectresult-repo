@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { AppProvider } from "@/context/AppContext";
 import MainHeader from "@/components/MainHeader";
 import Script from "next/script";
+import ScrollToTop from "@/components/ScrollToTop";
 import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
@@ -23,6 +24,7 @@ export default function RootLayout({ children }) {
           fontFamily: "var(--font-inter), var(--font-tamil), sans-serif",
         }}
       >
+	    <ScrollToTop /> 
         <AppProvider>
 
           {/* ✅ GLOBAL HEADER */}

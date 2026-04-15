@@ -3,7 +3,7 @@ const cache = new Map();
 const loadTNData = async (year, lang) => {
   try {
     const data = await import(`@/data/${year}/tn_results_${lang}.json`);
-	//console.log('election.js loadTNdata ' + year + ' ' + lang);
+	console.log('election.js loadTNdata ' + year + ' ' + lang);
     return data.default;
   } catch (e) {
     console.error(`Data load error for year ${year} (${lang})`, e);
@@ -14,7 +14,7 @@ const loadTNData = async (year, lang) => {
 export const getElectionData = async (year, lang) => {
   const key = `${year}-${lang}`;
   if (cache.has(key)) {
-	//console.log('data get from cache. key: ' + key);
+	console.log('data get from cache. key: ' + key);
     return cache.get(key); 
   }
 
@@ -34,7 +34,7 @@ export const getElectionData = async (year, lang) => {
   
   cache.set(key, promise);
 
-  //console.log('data set into cache. key: ' + key);
+  console.log('data set into cache. key: ' + key);
   return promise;
 };
 
@@ -76,15 +76,19 @@ export const partyColors = {
   "PMK":         "#F59E0B",   // PMK amber
   "CPM":         "#9B1C1C",   // CPM dark red
   "CPI":         "#DC2626",   // CPI red
+  "TVK": 		 "#FFFF00",   // TVK yellow
+  "AMMK":        "#000000",   // AMMK black
   // Tamil party keys (from TA JSON)
-  "திமுக":        "#E31E24",
-  "அதிமுக":       "#00A651",
-  "காங்கிரஸ்":    "#139BD4",
+  "திமுக":       "#E31E24",
+  "அதிமுக":     "#00A651",
+  "காங்":        "#139BD4",
   "பாஜக":       "#FF6B00",
-  "விசிக":         "#7C3AED",
-  "பாமக":          "#F59E0B",
-  "மார்க்சிஸ்ட்":  "#9B1C1C",
-  "கம்யூனிஸ்ட்":  "#DC2626",
+  "விசிக":       "#7C3AED",
+  "பாமக":       "#F59E0B",
+  "சிபிஎம்":      "#9B1C1C",
+  "சிபிஐ":        "#DC2626",
+  "தவெக": 	  "#FFFF00", 
+  "அமமுக":      "#000000",
   // Fallback
   "Independent": "#6B7280",
   "Other":       "#9B59B6"

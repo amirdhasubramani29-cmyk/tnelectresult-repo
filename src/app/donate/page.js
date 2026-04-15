@@ -281,7 +281,8 @@ export default function DonatePage() {
 						  left: 0,
 						  width: '100%',
 						  height: '100%',
-						  background: 'rgba(0,0,0,0.5)',
+						  background: 'rgba(0,0,0,0.6)',
+						  backdropFilter: 'blur(4px)',
 						  display: 'flex',
 						  alignItems: 'center',
 						  justifyContent: 'center',
@@ -290,7 +291,9 @@ export default function DonatePage() {
 					  >
 						<div
 						  style={{
-							background: '#fff',
+							background: 'var(--bg-card)',
+							color: 'var(--text-primary)',
+							border: '1px solid var(--border)',
 							padding: '20px',
 							borderRadius: '12px',
 							width: '90%',

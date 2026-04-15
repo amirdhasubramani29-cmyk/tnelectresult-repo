@@ -32,6 +32,8 @@ import {
 
 import { Trophy, Swords, MapPin, TrendingUp, Users } from 'lucide-react';
 
+import { ELECTION_CONFIG } from "@/config/electionConfig";
+
 export default function Dashboard() {
   const { t, lang, year } = useApp();
   const [data, setData] = useState(null);
@@ -78,7 +80,7 @@ export default function Dashboard() {
 
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.length) return null;
-    const party = payload[0]?.name || payload[0]?.payload?.party;
+    const party = payload?.[0]?.name !== "seats" ? payload?.[0]?.name : payload?.[0]?.payload?.party;
     return (
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 14px' }}>
         <p style={{ fontWeight: 700, color: getPartyColor(party) }}>{party}</p>
@@ -92,15 +94,15 @@ export default function Dashboard() {
   const summary = getPartySummary(data.constituencies);
   const insights = getInsights(data);
 
-  const dmkSeats =
-    summary.find(p => ['DMK', 'திமுக'].includes(p.party))?.seats || 0;
-
-  const admkSeats =
-    summary.find(p => ['ADMK', 'அதிமுக'].includes(p.party))?.seats || 0;
-
-  const allianceSeats = summary
+  const dmkAllianceSeats = summary
     .filter(p =>
-      ['DMK', 'INC', 'VCK', 'CPI', 'CPM', 'திமுக', 'காங்கிரஸ்'].includes(p.party)
+      ['DMK', 'INC', 'VCK', 'CPI', 'CPM', 'திமுக', 'காங்', 'விசிக', 'சிபிஎம்', 'சிபிஐ'].includes(p.party)
+    )
+    .reduce((s, p) => s + p.seats, 0);
+	
+  const admkAllianceSeats = summary
+    .filter(p =>
+      ['ADMK', 'BJP', 'PMK', 'AMMK', 'அதிமுக', 'பாஜக', 'பாமக', 'அமமுக'].includes(p.party)
     )
     .reduce((s, p) => s + p.seats, 0);
 
@@ -113,7 +115,7 @@ export default function Dashboard() {
           <div>
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '4px' }}>🏆 {t('Winning Coalition', 'வெற்றி கூட்டணி')}</div>
             <div style={{ fontSize: '22px', fontWeight: 800, color: '#22c55e' }}>
-              {t('DMK Alliance', 'திமுக கூட்டணி')} — {allianceSeats} {t('Seats', 'இடங்கள்')}
+				{summary?.[0]?.party} {t(' Alliance', ' கூட்டணி')} — {dmkAllianceSeats > admkAllianceSeats ? dmkAllianceSeats : admkAllianceSeats} {t('Seats', 'இடங்கள்')}
             </div>
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
               {t('Majority mark: 118 of 234 seats', 'பெரும்பான்மை நிலை: 234 இல் 118 இடங்கள்')}
@@ -122,9 +124,10 @@ export default function Dashboard() {
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <StatCard label={t('Total Seats', 'மொத்த இடங்கள்')} value={234} color="var(--accent-blue)" />
             <StatCard label={t('Majority Mark', 'பெரும்பான்மை')} value={118} color="#22c55e" />
-            <StatCard label={t('DMK', 'திமுக')} value={dmkSeats} color="#E31E24" />
-            <StatCard label={t('Alliance', 'கூட்டணி')} value={allianceSeats} color="#22c55e" />
-            <StatCard label={t('ADMK', 'அதிமுக')} value={admkSeats} color="#00A651" />
+            <StatCard label={summary?.[0]?.party} value={summary?.[0]?.seats} color="#E31E24" />
+            <StatCard label={`${summary?.[0]?.party} ${t("Alliance", "கூட்டணி")}`} value={dmkAllianceSeats > admkAllianceSeats ? dmkAllianceSeats : admkAllianceSeats} color="#22c55e" />
+            {/*<StatCard label={summary?.[1]?.party} value={summary?.[1]?.seats} color="#00A651" />
+			<StatCard label={`${summary?.[1]?.party} ${t("Alliance", "கூட்டணி")}`} value={dmkAllianceSeats > admkAllianceSeats ? admkAllianceSeats : dmkAllianceSeats} color="#22c55e" />*/}
           </div>
         </div>
       </div>
@@ -171,7 +174,7 @@ export default function Dashboard() {
             {t('Majority Progress', 'பெரும்பான்மை முன்னேற்றம்')}
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {summary.slice(0, 6).map(({ party, seats }) => (
+            {summary.slice(0, 5).map(({ party, seats }) => (
               <div key={party}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                   <span style={{ fontSize: '13px', fontWeight: 600, color: getPartyColor(party) }}>{party}</span>
@@ -190,6 +193,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── Insights Row ────────────────────── */}
+	  {ELECTION_CONFIG[year]?.status == 'final' && (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
         <InsightCard
           icon={<Trophy size={20} color="#f59e0b" />}
@@ -215,11 +219,14 @@ export default function Dashboard() {
         <InsightCard
           icon={<Users size={20} color="#3b82f6" />}
           title={t('Alliance Total', 'கூட்டணி மொத்தம்')}
-          body={`${allianceSeats} ${t('seats', 'இடங்கள்')}`}
-          sub={t('DMK + INC + VCK + CPI + CPM', 'திமுக + காங்கிரஸ் + விசிக + கம்யூனிஸ்ட்')}
+          body={`${dmkAllianceSeats > admkAllianceSeats ? dmkAllianceSeats : admkAllianceSeats} ${t('seats', 'இடங்கள்')}`}
+          sub={dmkAllianceSeats > admkAllianceSeats 
+		  ? t('DMK + INC + VCK + CPI + CPM', 'திமுக + காங் + விசிக + சிபிஎம் + சிபிஐ')
+		  : t('ADMK + BJP + PMK', 'அதிமுக + பாஜக + பாமக')}
           accent="#3b82f6"
         />
       </div>
+	  )}
 
       {/* ── District-level Map + Drill-down ─── */}
       <div className="card" style={{ padding: '24px' }}>

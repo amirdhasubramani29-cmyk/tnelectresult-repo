@@ -5,8 +5,8 @@ import { getPartyColor } from '@/data/elections';
 import { SortAsc } from 'lucide-react';
 
 // EN party keys that match the actual data
-const EN_PARTIES = ['All', 'DMK', 'ADMK', 'INC', 'BJP', 'PMK', 'VCK', 'CPI', 'CPM'];
-const TA_PARTIES = ['All', 'திமுக', 'அதிமுக', 'காங்கிரஸ்', 'பாஜக', 'பாமக', 'விசிக', 'கம்யூனிஸ்ட்', 'மார்க்சிஸ்ட்'];
+const EN_PARTIES = ['All', 'DMK', 'ADMK', 'INC', 'BJP', 'TVK', 'PMK', 'VCK', 'CPI', 'CPM', 'AMMK'];
+const TA_PARTIES = ['All', 'திமுக', 'அதிமுக', 'காங்', 'பாஜக', 'தவெக', 'பாமக', 'விசிக', 'சிபிஎம்', 'சிபிஐ', 'அமமுக'];
 
 export default function FilterBar() {
   const { t, lang, filterParty, setFilterParty, sortBy, setSortBy } = useApp();
@@ -37,7 +37,7 @@ export default function FilterBar() {
 				  {party !== 'All' && (
 					<span style={{ width: '8px', height: '8px', borderRadius: '50%', background: color, display: 'inline-block', marginRight: '4px' }} />
 				  )}
-				  {party == 'All' ? 'அனைத்து கட்சிகள்' : party}
+				  {party == 'All' ? 'அனைத்தும்' : party}
 				</button>
 			  );
 			})
@@ -70,7 +70,7 @@ export default function FilterBar() {
       {/* Sort */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <SortAsc size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
-        <select className="input" style={{ width: 'auto', minWidth: '160px' }} value={sortBy} onChange={e => setSortBy(e.target.value)}>
+        <select className="input" style={{ width: '100%', minWidth: '0' }} value={sortBy} onChange={e => setSortBy(e.target.value)}>
           <option value="id">{t('Constituency #', 'தொகுதி #')}</option>
           <option value="margin">{t('Margin (High→Low)', 'இடைவெளி (அதிகம்→குறைவு)')}</option>
           <option value="votes">{t('Votes (High→Low)', 'வாக்குகள் (அதிகம்→குறைவு)')}</option>

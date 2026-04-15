@@ -4,44 +4,62 @@ import { useApp } from '@/context/AppContext';
 import { useState, useEffect, useMemo } from 'react';
 import { getElectionData, getPartySummary, getPartyColor } from '@/data/elections';
 import { ArrowRight, BarChart2, MapPin, Globe, Zap } from 'lucide-react';
+import { ELECTION_CONFIG } from "@/config/electionConfig";
+import ElectionCard from "@/components/ElectionCard";
 
 export default function HomePage() {
   const { t, theme, year, lang } = useApp();
-  const [data, setData] = useState(null);
+  const [dataByYear, setDataByYear] = useState({});
   
   useEffect(() => {
-    const loadData = async () => {
-      const result = await getElectionData(year, lang);
-      setData(result);
-    };
+    const loadAll = async () => {
+		const results = await Promise.all(
+		  visibleYears.map((y) => getElectionData(y, lang))
+		);
 
-    loadData();
-  }, [year, lang]);
+		const mapped = {};
+		visibleYears.forEach((y, i) => {
+		  mapped[y] = results[i];
+		});
+
+		setDataByYear(mapped);
+	};
+	loadAll();
+  }, [lang]);
   
-  const { summary, topParties } = useMemo(() => {
-    if (!data?.constituencies) {
-		return { summary: [], topParties: [] };
-	}
+  const topPartiesByYear = useMemo(() => {
+    const result = {};
 
-    const summary = getPartySummary(data.constituencies);
-	const topParties = summary.slice(0, 4);
+    Object.entries(dataByYear).forEach(([year, data]) => {
+      if (!data?.constituencies) {
+        result[year] = [];
+        return;
+      }
 
-    return { summary, topParties };
-  }, [data, lang]);
+      const summary = getPartySummary(data.constituencies);
+      result[year] = summary.slice(0, 4);
+    });
+
+    return result;
+  }, [dataByYear]);
+  
+  const visibleYears = Object.keys(ELECTION_CONFIG)
+  .map(Number).filter((year) => ELECTION_CONFIG[year]?.enabled);
 
   return (
     <div style={{ minHeight: '80vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
 
       {/* ── Hero Section ──────────────────────── */}
-      <section style={{ padding: '60px 24px 40px', maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
+      <section style={{ padding: '40px 24px 40px', maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: '20px', padding: '6px 16px', marginBottom: '24px', fontSize: '13px', color: '#3b82f6', fontWeight: 600 }}>
           <Zap size={14} /> {t('Election Data Platform', 'தேர்தல் தரவு தளம்')}
         </div>
 
         <h1 style={{ fontSize: 'clamp(28px, 5vw, 52px)', fontWeight: 900, lineHeight: 1.15, marginBottom: '16px', color: 'var(--text-primary)' }}>
           {t('Tamil Nadu Election', 'தமிழ்நாடு தேர்தல்')}{' '}
-          <span style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-            {t('Results Dashboard', 'முடிவுகள் தளம்')}
+          <span style={{ background: 'linear-gradient(135deg, rgb(59,130,246), rgb(139,92,246))', WebkitBackgroundClip: 'text', backgroundClip: 'text', 
+			color: 'transparent', paddingBottom: '4px'  }}>
+              {t('Results Dashboard', 'முடிவுகள் தளம்')}
           </span>
         </h1>
 
@@ -54,7 +72,7 @@ export default function HomePage() {
 
         {/* Quick party tally */}
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '36px' }}>
-          {topParties.map(({ party, seats }) => (
+          {(topPartiesByYear[2021] || []).map(({ party, seats }) => (
             <div key={party} style={{ background: 'var(--bg-card)', border: `2px solid ${getPartyColor(party)}40`, borderRadius: '14px', padding: '12px 20px', minWidth: '90px', textAlign: 'center', transition: 'transform 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
@@ -116,34 +134,19 @@ export default function HomePage() {
           🗳️ {t('Available Elections', 'கிடைக்கக்கூடிய தேர்தல்கள்')}
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
-          {/* TN 2021 */}
-          <Link href="/tn/2021" style={{ textDecoration: 'none' }}>
-            <div className="card" style={{ padding: '22px', cursor: 'pointer', borderLeft: '4px solid #E31E24' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                <span style={{ fontSize: '24px' }}>🏛️</span>
-                <div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>{t('Tamil Nadu 2021', 'தமிழ்நாடு 2021')}</div>
-                  <div style={{ fontSize: '12px', color: '#22c55e', fontWeight: 600 }}>✓ {t('Results Available', 'முடிவுகள் கிடைக்கின்றன')}</div>
-                </div>
-              </div>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '14px' }}>
-                {t('Assembly Election · 234 Constituencies', 'சட்டமன்றத் தேர்தல் · 234 தொகுதிகள்')}
-              </p>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {topParties.map(({ party, seats }) => (
-                  <span key={party} className="badge" style={{ background: `${getPartyColor(party)}18`, color: getPartyColor(party), border: `1px solid ${getPartyColor(party)}40` }}>
-                    {party} {seats}
-                  </span>
-                ))}
-              </div>
-              <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: '#3b82f6', fontSize: '13px', fontWeight: 600 }}>
-                {t('Explore Results', 'முடிவுகளை ஆராயுங்கள்')} <ArrowRight size={14} />
-              </div>
-            </div>
-          </Link>
+			
+			{visibleYears.map((year) => (
+			  <ElectionCard
+				key={year}
+				year={year}
+				topParties={topPartiesByYear[year] || []}
+				t={t}
+			  />
+			))}
 
           {/* TN 2026 placeholder */}
-          <div className="card" style={{ padding: '22px', opacity: 0.6, cursor: 'not-allowed', borderLeft: '4px solid var(--border)' }}>
+          {ELECTION_CONFIG[2026]?.status == 'upcoming' && (
+		  <div className="card" style={{ padding: '22px', opacity: 0.6, cursor: 'not-allowed', borderLeft: '4px solid var(--border)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
               <span style={{ fontSize: '24px' }}>🔮</span>
               <div>
@@ -154,7 +157,7 @@ export default function HomePage() {
             <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
               {t('Next Assembly Election · Results not yet available', 'அடுத்த சட்டமன்றத் தேர்தல் · முடிவுகள் இன்னும் இல்லை')}
             </p>
-          </div>
+          </div>)}
         </div>
       </section>
     </div>

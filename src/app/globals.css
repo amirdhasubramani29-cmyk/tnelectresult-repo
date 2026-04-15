@@ -287,6 +287,10 @@ select.input option {
   font-weight: 500;
 }
 
+a.active {
+  background: #3b82f61a!important;
+}
+
 /* desktop */
 @media (min-width: 768px) {
   .district-layout {

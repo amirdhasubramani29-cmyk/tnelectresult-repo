@@ -4,10 +4,13 @@ import { Sun, Moon, Globe, Home, Heart, BarChart2, Menu, X } from 'lucide-react'
 import Link from 'next/link';
 import { usePathname } from "next/navigation";
 import { useState } from 'react';
+import { ELECTION_CONFIG } from "@/config/electionConfig";
 
 export default function MainHeader() {
   const { lang, setLang, theme, setTheme, t } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const visibleYears = Object.keys(ELECTION_CONFIG)
+  .map(Number).filter((year) => ELECTION_CONFIG[year]?.enabled);
 
   return (
     <header style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 1000 }}>
@@ -29,7 +32,14 @@ export default function MainHeader() {
         {/* CENTER — Nav links (desktop only) */}
         <nav className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <NavLink href="/" icon={<Home size={15} />} label={t('Home', 'முகப்பு')} />
-          <NavLink href="/tn/2021" icon={<BarChart2 size={15} />} label={t('Results 2021', 'முடிவுகள் 2021')} />
+          {visibleYears.map((year) => (
+			<NavLink
+			  key={year}
+			  href={`/tn/${year}`}
+			  icon={<BarChart2 size={15}/>}
+			  label={t(`Results ${year}`, `முடிவுகள் ${year}`)}
+			/>))
+		  }
           <NavLink href="/donate" icon={<Heart size={15} />} label={t('Donate', 'ஆதரவு')} accent />
         </nav>
 
@@ -85,8 +95,10 @@ export default function MainHeader() {
 }
 
 function NavLink({ href, icon, label, accent }) {
+  const pathname = usePathname();
+  const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
   return (
-    <Link href={href} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 12px', borderRadius: '8px', fontSize: '14px', fontWeight: 500, color: accent ? 'var(--accent-yellow)' : 'var(--text-secondary)', textDecoration: 'none', transition: 'all 0.2s' }}
+    <Link href={href}  className={isActive ? "active" : ""} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 12px', borderRadius: '8px', fontSize: '14px', fontWeight: 500, color: accent ? 'var(--accent-yellow)' : 'var(--text-secondary)', textDecoration: 'none', transition: 'all 0.2s' }}
       onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-card)'; e.currentTarget.style.color = accent ? 'var(--accent-yellow)' : 'var(--accent-blue)'; }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = accent ? 'var(--accent-yellow)' : 'var(--text-secondary)'; }}
     >

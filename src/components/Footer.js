@@ -2,9 +2,14 @@
 import Link from 'next/link';
 import { Home, Heart, BarChart2, ExternalLink } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { usePathname } from "next/navigation";
+import { ELECTION_CONFIG } from "@/config/electionConfig";
 
 export default function Footer() {
   const { t } = useApp();
+  
+  const visibleYears = Object.keys(ELECTION_CONFIG)
+  .map(Number).filter((year) => ELECTION_CONFIG[year]?.enabled);
 
   return (
     <footer style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', borderTop: '1px solid var(--border)', marginTop: '40px' }}>
@@ -34,9 +39,15 @@ export default function Footer() {
             <p style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
               {t('Navigation', 'வழிசெலுத்தல்')}
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <FooterLink href="/" icon={<Home size={14} />} label={t('Home', 'முகப்பு')} />
-              <FooterLink href="/tn/2021" icon={<BarChart2 size={14} />} label={t('TN 2021 Results', 'தமிழ்நாடு 2021 முடிவுகள்')} />
+              {visibleYears.map((year) => (
+				<FooterLink
+				  key={year}
+				  href={`/tn/${year}`}
+				  icon={<BarChart2 size={14}/>}
+				  label={t(`TN ${year} Results`, `தமிழ்நாடு ${year} முடிவுகள்`)}
+				/>))}
               <FooterLink href="/donate" icon={<Heart size={14} />} label={t('Support / Donate', 'ஆதரவு / நன்கொடை')} accent />
             </div>
           </div>
@@ -88,8 +99,11 @@ export default function Footer() {
 }
 
 function FooterLink({ href, icon, label, accent }) {
+  const pathname = usePathname();
+  const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
   return (
-    <Link href={href} style={{ textDecoration: "none", display: "inline-block", width: "fit-content"   }}>
+    <Link href={href} 
+      className={isActive ? "active" : ""} 	style={{ textDecoration: "none", display: "inline-block", width: "fit-content"   }}>
       <span
         style={{
           display: "inline-flex", // 🔥 key

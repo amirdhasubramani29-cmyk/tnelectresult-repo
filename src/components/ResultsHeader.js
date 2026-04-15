@@ -2,11 +2,13 @@
 import { useApp } from '@/context/AppContext';
 import { useState, useEffect } from 'react';
 import { getElectionData, getPartySummary, getPartyColor } from '@/data/elections';
+import { ELECTION_CONFIG } from "@/config/electionConfig";
 
 export default function ResultsHeader() {
   
   const { t, lang, year } = useApp();
   const [data, setData] = useState(null);
+  const status = ELECTION_CONFIG[year]?.status;
 
   useEffect(() => {
     const loadData = async () => {
@@ -32,12 +34,16 @@ export default function ResultsHeader() {
         {/* Title */}
         <div>
           <h1 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>
-            🗳️ {t('Tamil Nadu Assembly Election 2021', 'தமிழ்நாடு சட்டமன்றத் தேர்தல் 2021')}
+            🗳️ {t(`Tamil Nadu Assembly Election ${year}`, `தமிழ்நாடு சட்டமன்றத் தேர்தல் ${year}`)}
           </h1>
           <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
             {t('Results for all 234 constituencies', '234 தொகுதிகளின் முடிவுகள்')}
             {' · '}
-            <span style={{ color: '#22c55e', fontWeight: 600 }}>✓ {t('Final Results', 'இறுதி முடிவுகள்')}</span>
+            <span style={{ color: '#22c55e', fontWeight: 600 }}>  
+				✓ {status === "final" 
+				? t("Results Available", "முடிவுகள் கிடைக்கின்றன")
+				: t("Results in Progress", "முடிவுகள் நடைபெற்று வருகின்றன")}
+				</span>
           </p>
         </div>
 
