@@ -11,7 +11,7 @@ import {
   getPartyName
 } from '@/data/elections';
 
-import TamilNaduMap from '@/components/map/TamilNaduMap';
+import TamilNaduMap from '@/components/TamilNaduMap';
 
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
@@ -21,7 +21,7 @@ import {
 import {
   transformData,
   buildDistrictMap,
-  formatDistrictName
+  getPartyDisplayName
 } from '@/utils/dataAdapter';
 
 import {
@@ -39,38 +39,59 @@ export default function Dashboard() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    const loadData = async () => {
-      const result = await getElectionData(year, lang);
+	setData(null);
+    const unsubscribe = getElectionData(year, lang, (result) => {
       setData(result);
-    };
+    });
 
-    loadData();
+    return () => {
+      if (typeof unsubscribe === "function") {
+        unsubscribe();
+      }
+    };
   }, [year, lang]);
   
-  const DEFAULT_DISTRICT = lang === 'ta' ? 'சென்னை' : 'chennai';
-  const [selectedDistrict, setSelectedDistrict] = useState(DEFAULT_DISTRICT);
-  const districtDisplayLookup = {};
-  const partyDisplayLookup    = {};
-
+  const [selectedDistrict, setSelectedDistrict] = useState(lang === 'ta' ? 'சென்னை' : 'chennai');
+ 
   useEffect(() => {
     setSelectedDistrict(lang === 'ta' ? 'சென்னை' : 'chennai');
   }, [lang]);
   
-  const { districtMap, mapData, grouped, districtPartyMap } = useMemo(() => {
-    if (!data) return {};
+  const { mapData, grouped, districtPartyMap, districtDisplayLookup, partyDisplayLookup } = useMemo(() => {
+    if (!data) {
+      return {
+        mapData: [],
+        grouped: {},
+        districtPartyMap: {},
+        districtDisplayLookup: {},
+        partyDisplayLookup: {},
+      };
+    }
 
-    const districtMap = buildDistrictMap(data.constituencies);
-    const mapData = transformData(data, lang, districtMap);
-
+    const mapData = transformData(data, lang);
+    //console.log(data.constituencies[0].district_en + ' ' + data.constituencies[0].district_ta);
     const grouped = groupByDistrict(mapData);
+	//console.log('grouped data by ' + lang + ' key: ' + mapData[0].districtKey + ' display: ' + mapData[0].districtDisplay);
     const districtPartyMap = getDistrictPartyMap(mapData);
-	
-	mapData.forEach(item => {
+
+    const districtDisplayLookup = {};
+    const partyDisplayLookup = {};
+
+    mapData.forEach((item) => {
       districtDisplayLookup[item.districtKey] = item.districtDisplay;
-      partyDisplayLookup[item.party]          = item.partyDisplay;
+      partyDisplayLookup[item.party] = item.partyDisplay;
+	  //console.log(item.districtKey);
+	  //console.log(item.districtDisplay);
+	  //console.log(item);
     });
 
-    return { districtMap, mapData, grouped, districtPartyMap };
+    return {
+      mapData,
+      grouped,
+      districtPartyMap,
+      districtDisplayLookup,
+      partyDisplayLookup,
+    };
   }, [data, lang]);
   
   const allDistricts = useMemo(() => {
@@ -83,16 +104,20 @@ export default function Dashboard() {
     const party = payload?.[0]?.name !== "seats" ? payload?.[0]?.name : payload?.[0]?.payload?.party;
     return (
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px 14px' }}>
-        <p style={{ fontWeight: 700, color: getPartyColor(party) }}>{party}</p>
+        <p style={{ fontWeight: 700, color: getPartyColor(party) }}>{getPartyDisplayName(party, lang)}</p>
         <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{payload[0].value} {t('seats', 'இடங்கள்')}</p>
       </div>
     );
   };
   
-  if (!data) return <div>Loading...</div>;
+  if (!data) return <div style={{ padding: 20 }}>Loading ...</div>;
 
-  const summary = getPartySummary(data.constituencies);
-  const insights = getInsights(data);
+  const summary = data ? getPartySummary(data.constituencies) : [];
+  const insights = data ? getInsights(data) : {};
+  
+  const filteredSummary = summary.filter(
+    entry => entry.party?.toLowerCase() !== "unknown"
+   );
 
   const dmkAllianceSeats = summary
     .filter(p =>
@@ -110,27 +135,81 @@ export default function Dashboard() {
     <div style={{ display: 'grid', gap: '24px' }}>
 
       {/* ── Coalition Banner ────────────────── */}
-      <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.12), rgba(59,130,246,0.12))', border: '1px solid rgba(34,197,94,0.35)', borderRadius: '16px', padding: '20px 24px' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '4px' }}>🏆 {t('Winning Coalition', 'வெற்றி கூட்டணி')}</div>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: '#22c55e' }}>
-				{summary?.[0]?.party} {t(' Alliance', ' கூட்டணி')} — {dmkAllianceSeats > admkAllianceSeats ? dmkAllianceSeats : admkAllianceSeats} {t('Seats', 'இடங்கள்')}
+      
+        {ELECTION_CONFIG[year]?.status == 'final' && ( 
+		  <>
+		  <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.12), rgba(59,130,246,0.12))', border: '1px solid rgba(34,197,94,0.35)', borderRadius: '16px', padding: '20px 24px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+				<div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '4px' }}>🏆 {t('Winning Coalition', 'வெற்றி கூட்டணி')}</div>
+				<div style={{ fontSize: '22px', fontWeight: 800, color: '#22c55e' }}>
+					{summary?.[0]?.party} {t(' Alliance', ' கூட்டணி')} — {dmkAllianceSeats > admkAllianceSeats ? dmkAllianceSeats : admkAllianceSeats} {t('Seats', 'இடங்கள்')}
+				</div>
+				<div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
+				  {t('Majority mark: 118 of 234 seats', 'பெரும்பான்மை நிலை: 234 இல் 118 இடங்கள்')}
+				</div>
+			  </div>
+			  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+				<StatCard label={t('Total Seats', 'மொத்த இடங்கள்')} value={234} color="var(--accent-blue)" />
+				<StatCard label={t('Majority Mark', 'பெரும்பான்மை')} value={118} color="#4B5563" />
+				<StatCard label={summary?.[0]?.party} value={summary?.[0]?.seats} 
+				  color={getPartyColor(summary?.[0]?.party)} />
+				<StatCard label={`${summary?.[0]?.party} ${t("Alliance", "கூட்டணி")}`} 
+				  value={dmkAllianceSeats > admkAllianceSeats ? dmkAllianceSeats : admkAllianceSeats} 
+				  color={getPartyColor(summary?.[0]?.party)} />
+			  </div>
             </div>
-            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
-              {t('Majority mark: 118 of 234 seats', 'பெரும்பான்மை நிலை: 234 இல் 118 இடங்கள்')}
+           </div>
+		  </>
+		)}
+			
+        {ELECTION_CONFIG[year]?.status == 'progress' && (
+		  <>
+		  <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.12), rgba(59,130,246,0.12))', border: '1px solid rgba(34,197,94,0.35)', borderRadius: '16px', padding: '20px 24px' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+				<div style={{ fontSize: '22px', fontWeight: 800, color: '#22c55e' }}>
+					🏆 {t('Election Leading Results', 'தேர்தல் முன்னணி நிலவரம்')}
+				</div>
+			  </div>
+			<div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+			  <StatCard label={t('Total Seats', 'மொத்த இடங்கள்')} value={234} color="var(--accent-blue)" />
+              <StatCard label={t('Majority Mark', 'பெரும்பான்மை')} value={118} color="#4B5563" />
+              {(dmkAllianceSeats > 0 || admkAllianceSeats > 0) && (
+			  <>
+			  
+			  {summary?.[0]?.party?.toLowerCase() !== "unknown" && (
+			    <>
+			    <StatCard label={summary?.[0]?.party} 
+				  value={summary?.[0]?.seats} color="#E31E24" />
+                <StatCard label={`${summary?.[0]?.party} ${t("Alliance", "கூட்டணி")}`} 
+				  value={dmkAllianceSeats > admkAllianceSeats ? dmkAllianceSeats : admkAllianceSeats} color="#22c55e" />
+				</>
+			  )}
+              <StatCard label={getPartyDisplayName(summary?.[1]?.party, lang)} 
+			    value={summary?.[1]?.seats} 
+				color={getPartyColor(summary?.[1]?.party)} />
+			  <StatCard label={`${getPartyDisplayName(summary?.[1]?.party, lang)} ${t("Alliance", "கூட்டணி")}`} 
+			    value={dmkAllianceSeats > admkAllianceSeats ? admkAllianceSeats : dmkAllianceSeats} 
+			    color={getPartyColor(summary?.[1]?.party)} />
+				
+			  {summary?.[0]?.party?.toLowerCase() === "unknown" && (
+			    <>
+			     <StatCard label={getPartyDisplayName(summary?.[2]?.party, lang)} 
+				   value={summary?.[2]?.seats} 
+				   color={getPartyColor(summary?.[2]?.party)} />
+			     <StatCard label={`${getPartyDisplayName(summary?.[2]?.party, lang)} ${t("Alliance", "கூட்டணி")}`}
+                   value={dmkAllianceSeats > admkAllianceSeats ? admkAllianceSeats : dmkAllianceSeats }
+                   color={getPartyColor(summary?.[2]?.party)} />
+				</>
+			   )}
+			  </>
+			  )}
+			</div>
             </div>
-          </div>
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <StatCard label={t('Total Seats', 'மொத்த இடங்கள்')} value={234} color="var(--accent-blue)" />
-            <StatCard label={t('Majority Mark', 'பெரும்பான்மை')} value={118} color="#22c55e" />
-            <StatCard label={summary?.[0]?.party} value={summary?.[0]?.seats} color="#E31E24" />
-            <StatCard label={`${summary?.[0]?.party} ${t("Alliance", "கூட்டணி")}`} value={dmkAllianceSeats > admkAllianceSeats ? dmkAllianceSeats : admkAllianceSeats} color="#22c55e" />
-            {/*<StatCard label={summary?.[1]?.party} value={summary?.[1]?.seats} color="#00A651" />
-			<StatCard label={`${summary?.[1]?.party} ${t("Alliance", "கூட்டணி")}`} value={dmkAllianceSeats > admkAllianceSeats ? admkAllianceSeats : dmkAllianceSeats} color="#22c55e" />*/}
-          </div>
-        </div>
-      </div>
+           </div>
+		  </>
+	    )}
 
       {/* ── Charts Row ──────────────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '20px' }}>
@@ -142,11 +221,12 @@ export default function Dashboard() {
           </h3>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
-              <Pie data={summary} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={2} dataKey="seats" nameKey="party">
-                {summary.map((entry, i) => <Cell key={i} fill={getPartyColor(entry.party)} />)}
+              <Pie data={filteredSummary} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={2} dataKey="seats" nameKey="party">
+                {filteredSummary
+				  .map((entry, i) => <Cell key={i} fill={getPartyColor(entry.party)} />)}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
-              <Legend formatter={v => <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>{v}</span>} />
+              <Legend formatter={v => <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>{getPartyDisplayName(v, lang)}</span>} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -154,17 +234,24 @@ export default function Dashboard() {
         {/* Bar Chart */}
         <div className="card" style={{ padding: '24px' }}>
           <h3 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '20px', color: 'var(--text-primary)' }}>
-            {t('Seats Won by Party', 'கட்சிவாரியான வெற்றி')}
+            {ELECTION_CONFIG[year]?.status == 'final' 
+			  ? t('Seats Won by Party', 'கட்சிவாரியான வெற்றி')
+			  : t('Seats Leading by Party', 'கட்சிவாரியான முன்னணி')
+			}
           </h3>
           <ResponsiveContainer width="100%" height={230}>
-            <BarChart data={summary} margin={{ left: -15 }}>
-              <XAxis dataKey="party" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
-              <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="seats" radius={[6, 6, 0, 0]}>
-                {summary.map((entry, i) => <Cell key={i} fill={getPartyColor(entry.party)} />)}
-              </Bar>
-            </BarChart>
+			<BarChart data={filteredSummary} margin={{ left: -15 }}>
+			  <XAxis dataKey="party" tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
+                tickFormatter={(party) => getPartyDisplayName(party, lang)} />
+			  <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
+			  <Tooltip content={<CustomTooltip />} />
+
+			  <Bar dataKey="seats" radius={[6, 6, 0, 0]}>
+				{filteredSummary.map((entry, i) => (
+				  <Cell key={i} fill={getPartyColor(entry.party)} />
+				))}
+			  </Bar>
+			</BarChart>
           </ResponsiveContainer>
         </div>
 
@@ -174,16 +261,18 @@ export default function Dashboard() {
             {t('Majority Progress', 'பெரும்பான்மை முன்னேற்றம்')}
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {summary.slice(0, 5).map(({ party, seats }) => (
+            {summary
+			  .filter(entry => entry.party?.toLowerCase() !== "unknown")
+			  .slice(0, 5).map(({ party, seats }) => (
               <div key={party}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: getPartyColor(party) }}>{party}</span>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: getPartyColor(party) }}>{getPartyDisplayName(party, lang)}</span>
                   <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{seats} / 234</span>
                 </div>
                 <div className="progress-track">
                   <div className="progress-bar" style={{ width: `${(seats / 234) * 100}%`, background: getPartyColor(party) }} />
                 </div>
-                {seats >= 118 && (
+                {ELECTION_CONFIG[year]?.status == 'final' && seats >= 118 && (
                   <div style={{ fontSize: '11px', color: '#22c55e', marginTop: '3px' }}>✓ {t('Majority achieved', 'பெரும்பான்மை பெற்றது')}</div>
                 )}
               </div>
@@ -233,9 +322,12 @@ export default function Dashboard() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <MapPin size={18} color="var(--accent-blue)" />
-            {t('District-wise Results', 'மாவட்ட வாரியான முடிவுகள்')}
+            {ELECTION_CONFIG[year]?.status == 'final' 
+			  ? t('District-wise Results', 'மாவட்ட வாரியான முடிவுகள்')
+			  : t('District-wise Leading', 'மாவட்ட வாரியான முன்னணி')
+			}
           </h3>
-          {/*<select
+         {/* <select
             className="input"
             style={{ width: 'auto', minWidth: '180px' }}
             value={selectedDistrict}
@@ -253,7 +345,10 @@ export default function Dashboard() {
             <TamilNaduMap
 			  key={lang}
               selectedDistrict={selectedDistrict}
-              onSelect={setSelectedDistrict}
+              onSelect={(d) => {
+				//console.log("MAP CLICK: d: " + d);
+				setSelectedDistrict(d);
+			  }}
               districtPartyMap={districtPartyMap}
               lang={lang}
               districtDisplayLookup={districtDisplayLookup}
@@ -302,7 +397,9 @@ function InsightCard({ icon, title, body, sub, accent }) {
 
 function DistrictPanel({ selectedDistrict, grouped, districtDisplayLookup, t, lang }) {
   const constituenciesInDistrict = grouped[normalize(selectedDistrict)] || [];
-  const districtName = formatDistrictName(selectedDistrict);
+  const districtName = constituenciesInDistrict[0]?.districtDisplay || selectedDistrict;
+  //console.log(districtName);
+  //console.log(constituenciesInDistrict);
   
   const partySummary = {};
   constituenciesInDistrict.forEach(c => {
@@ -342,9 +439,9 @@ function DistrictPanel({ selectedDistrict, grouped, districtDisplayLookup, t, la
               <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{c.nameDisplay || c.name}</div>
               <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{c.winner}</div>
             </div>
-            <span className="badge" style={{ background: `${getPartyColor(c.party)}20`, color: getPartyColor(c.party), border: `1px solid ${getPartyColor(c.party)}40`, fontSize: '11px' }}>
+            {c.party && (<span className="badge" style={{ background: `${getPartyColor(c.party)}20`, color: getPartyColor(c.party), border: `1px solid ${getPartyColor(c.party)}40`, fontSize: '11px' }}>
               {c.partyDisplay || c.party}
-            </span>
+            </span>)}
           </div>
         ))}
         {constituenciesInDistrict.length === 0 && (

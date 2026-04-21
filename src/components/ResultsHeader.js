@@ -2,6 +2,7 @@
 import { useApp } from '@/context/AppContext';
 import { useState, useEffect } from 'react';
 import { getElectionData, getPartySummary, getPartyColor } from '@/data/elections';
+import { getPartyDisplayName } from '@/utils/dataAdapter';
 import { ELECTION_CONFIG } from "@/config/electionConfig";
 
 export default function ResultsHeader() {
@@ -11,11 +12,15 @@ export default function ResultsHeader() {
   const status = ELECTION_CONFIG[year]?.status;
 
   useEffect(() => {
-    const loadData = async () => {
-      const result = await getElectionData(year, lang);
+    const unsubscribe = getElectionData(year, lang, (result) => {
       setData(result);
+    });
+
+    return () => {
+      if (typeof unsubscribe === "function") {
+        unsubscribe();
+      }
     };
-    loadData();
   }, [year, lang]);
 
   if (!data) return null;
@@ -49,7 +54,9 @@ export default function ResultsHeader() {
 
         {/* Party seat tallies */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {summary.map(({ party, seats }) => (
+          {summary
+		    .filter(({ party }) => party?.toLowerCase() !== "unknown")
+		    .map(({ party, seats }) => (
             <div key={party} style={{
               background: `${getPartyColor(party)}12`,
               border: `1px solid ${getPartyColor(party)}40`,
@@ -59,7 +66,7 @@ export default function ResultsHeader() {
               minWidth: '64px',
             }}>
               <div style={{ fontSize: '20px', fontWeight: 900, color: getPartyColor(party), lineHeight: 1.1 }}>{seats}</div>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>{party}</div>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>{getPartyDisplayName(party, lang)}</div>
             </div>
           ))}
         </div>

@@ -20,11 +20,12 @@ export default function MainHeader() {
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
           <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>🗳️</div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '15px', color: 'var(--text-primary)', lineHeight: 1.4 }}>
-              {t('TN Election Dashboard', 'தேர்தல் முடிவுகள்')}
+            <div style={{ fontWeight: 800, fontSize: "clamp(10px, 3vw, 18px)", color: 'var(--text-primary)', lineHeight: 1.6 }}>
+              {t('TN Election Dashboard', 'தமிழ்நாடு தேர்தல் முடிவுகள்')}
             </div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1 }}>
-              {t('Tamil Nadu', 'தமிழ்நாடு')}
+            <div style={{ fontSize: "clamp(10px, 3vw, 14px)", color: 'var(--text-muted)', lineHeight: 1 }}>
+              <span style={{ background: 'linear-gradient(135deg, rgb(59,130,246), rgb(139,92,246))', WebkitBackgroundClip: 'text', backgroundClip: 'text', 
+			color: 'transparent', paddingBottom: '4px'  }}>tnelectionresults.site</span>
             </div>
           </div>
         </Link>

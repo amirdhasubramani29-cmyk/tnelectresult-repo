@@ -17,7 +17,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="light">
+    <html lang="en" className="light"  data-scroll-behavior="smooth">
 	  <body
         className={`${inter.variable} ${notoTamil.variable}`}
         style={{

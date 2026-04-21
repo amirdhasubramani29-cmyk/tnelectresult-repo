@@ -1,9 +1,11 @@
+import { subscribeToElection } from "@/services/firebaseService";
+
 const cache = new Map();
 
 const loadTNData = async (year, lang) => {
   try {
     const data = await import(`@/data/${year}/tn_results_${lang}.json`);
-	console.log('election.js loadTNdata ' + year + ' ' + lang);
+    //console.log("Loaded:", year, lang);
     return data.default;
   } catch (e) {
     console.error(`Data load error for year ${year} (${lang})`, e);
@@ -11,41 +13,74 @@ const loadTNData = async (year, lang) => {
   }
 };
 
-export const getElectionData = async (year, lang) => {
+export const getElectionData = (year, lang, callback) => {
   const key = `${year}-${lang}`;
+  
   if (cache.has(key)) {
-	console.log('data get from cache. key: ' + key);
-    return cache.get(key); 
+    callback(cache.get(key));
   }
 
-  const promise = (async () => {
-	const constituencies = await loadTNData(year, lang);
-	return {
-		state_en: "Tamil Nadu",
-		state_ta: "தமிழ்நாடு",
-		year,
-		total_seats: 234,
-		majority_mark: 118,
-		status: "final",
-		last_updated: "2021-05-02",
-		constituencies,
-	};
-  })();
-  
-  cache.set(key, promise);
+  // 2026 → Firebase (REALTIME)
+  if (year === 2026) {
+    const unsubscribe = subscribeToElection(year, (data) => {
+      const result = {
+        ...data,
+        year,
+      };
 
-  console.log('data set into cache. key: ' + key);
-  return promise;
+      cache.set(key, result);
+      callback(result);
+    });
+
+    return unsubscribe;
+  }
+
+  // 2021 → JSON (one-time)
+  if (cache.has(key)) {
+    callback(cache.get(key));
+    return () => {};
+  }
+
+  loadTNData(year, lang).then((constituencies) => {
+    const result = {
+      state_en: "Tamil Nadu",
+      state_ta: "தமிழ்நாடு",
+      year,
+      total_seats: 234,
+      majority_mark: 118,
+      status: "final",
+      last_updated: "2021-05-02",
+      constituencies,
+    };
+
+    cache.set(key, result);
+    callback(result);
+  });
+
+  return () => {};
 };
 
 const geoCache = new Map();
 
 export const getGeoData = async () => {
-  const key = "tn-districts";
+ const key = "tn-districts";
+
+  // 1. memory cache
   if (geoCache.has(key)) {
     return geoCache.get(key);
   }
 
+  // 2. localStorage cache
+  if (typeof window !== "undefined") {
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      geoCache.set(key, parsed);
+      return parsed;
+    }
+  }
+
+  // 3. fetch and cache
   const promise = (async () => {
     try {
       const res = await fetch("/tamilnadu_districts.json");
@@ -54,6 +89,15 @@ export const getGeoData = async () => {
       }
 
       const data = await res.json();
+
+      // store in memory
+      geoCache.set(key, data);
+
+      // store in localStorage
+      if (typeof window !== "undefined") {
+        localStorage.setItem(key, JSON.stringify(data));
+      }
+
       return data;
     } catch (e) {
       console.error("Geo data error:", e);
@@ -116,21 +160,45 @@ export function getPartyName(party, lang) {
 }
 
 export function getPartySummary(constituencies) {
+  if (!Array.isArray(constituencies)) {
+    console.warn("getPartySummary: invalid input", constituencies);
+    return [];
+  }
+
   const summary = {};
-  constituencies.forEach(c => {
-    const key = c.party;
+  constituencies.forEach((c) => {
+    const key = c?.party || "Unknown";
     summary[key] = (summary[key] || 0) + 1;
   });
+
   return Object.entries(summary)
     .map(([party, seats]) => ({ party, seats }))
     .sort((a, b) => b.seats - a.seats);
 }
 
 export function getInsights(data) {
-  const constituenciesSorted = [...data.constituencies].sort((a, b) => b.margin - a.margin);
+  const list = Array.isArray(data?.constituencies)
+    ? data.constituencies
+    : [];
+
+  if (list.length === 0) {
+    return {
+      biggestWin: null,
+      closestRace: null,
+      topParty: null,
+    };
+  }
+
+  const constituenciesSorted = [...list].sort(
+    (a, b) => (b?.margin || 0) - (a?.margin || 0)
+  );
+
+  const partySummary = getPartySummary(list);
+
   return {
-    biggestWin:   constituenciesSorted[0],
-    closestRace:  constituenciesSorted[constituenciesSorted.length - 1],
-    topParty:     getPartySummary(data.constituencies)[0]
+    biggestWin: constituenciesSorted[0] || null,
+    closestRace:
+      constituenciesSorted[constituenciesSorted.length - 1] || null,
+    topParty: partySummary[0] || null,
   };
 }

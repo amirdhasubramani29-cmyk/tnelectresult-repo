@@ -91,7 +91,7 @@ export default function TamilNaduMap({
 		const key = normalize(rawName, lang);
 		const displayDistrict = lang === "en" ? key.charAt(0).toUpperCase() + key.slice(1) : key;
 		const partyKey = districtPartyMap?.[key];
-		const party = partyDisplayLookup?.[partyKey] || partyKey || "N/A";
+		const party = partyDisplayLookup?.[partyKey] || partyKey || "";
 		const district = districtDisplayLookup?.[key] || rawName;
 
 		return `
@@ -129,7 +129,7 @@ export default function TamilNaduMap({
 		const feature = layer.feature;
 		const rawName = feature?.properties?.NAME_2 || "Unknown";
 		
-		layer.unbindTooltip(); // 🔥 important
+		layer.unbindTooltip();
 		layer.bindTooltip(getTooltipContent(rawName), {
 		  sticky: true,
 		  direction: "auto",

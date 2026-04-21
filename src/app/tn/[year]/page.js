@@ -1,4 +1,5 @@
 'use client';
+'use client';
 import { useApp } from '@/context/AppContext';
 import { useState, useEffect } from 'react';
 import { useParams, notFound } from "next/navigation";
@@ -8,7 +9,7 @@ import FilterBar from '@/components/FilterBar';
 import ResultsTable from '@/components/ResultsTable';
 import ConstituencyModal from '@/components/ConstituencyModal';
 import { ELECTION_CONFIG } from "@/config/electionConfig";
-import { TICKER_DATA } from "@/data/tickerData";
+import { subscribeTicker2026, getTickerData } from "@/services/tickerService";
 
 export default function TNPage() {
   const { t, lang, year: currentYear, setYear } = useApp();
@@ -26,7 +27,19 @@ export default function TNPage() {
     notFound();
   }
   
-  const ticker = TICKER_DATA?.[currentYear]?.[lang] || TICKER_DATA?.[currentYear]?.en || [];
+  const [tickerData, setTickerData] = useState({ en: [], ta: [] });
+  useEffect(() => {
+   if (!currentYear) return;
+    // 2026 → real-time
+    if (Number(currentYear) === 2026) {
+      const unsubscribe = subscribeTicker2026(setTickerData);
+      return () => unsubscribe(); // cleanup
+    }
+    // other years → static
+    getTickerData(currentYear).then(setTickerData);
+  }, [currentYear]);
+
+  const ticker = tickerData[lang] || tickerData.en || [];
  
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>

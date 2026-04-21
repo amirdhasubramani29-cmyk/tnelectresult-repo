@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
 import { Heart, Copy, Check, HeartHandshake, Star, Shield } from 'lucide-react';
 
-const UPI_ID = 'yourupi@bank';
+const UPI_ID = 'samirdha@ptaxis';
 
 export default function DonatePage() {
   const { t, lang } = useApp();

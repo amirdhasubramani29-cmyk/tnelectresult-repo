@@ -4,10 +4,12 @@ import { useApp } from '@/context/AppContext';
 import { getPartyColor, getPartyName, partyFullNames } from '@/data/elections';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { X, TrendingUp, Users, Award, MapPin } from 'lucide-react';
+import { ELECTION_CONFIG } from "@/config/electionConfig";
+import { getPartyDisplayName } from '@/utils/dataAdapter';
 
 export default function ConstituencyModal() {
 	  
-  const { selectedConstituency, setSelectedConstituency, t, lang } = useApp();
+  const { selectedConstituency, setSelectedConstituency, t, lang, year } = useApp();
   
   useEffect(() => {
     if (selectedConstituency) {
@@ -24,20 +26,40 @@ export default function ConstituencyModal() {
   if (!selectedConstituency) return null;
 
   const c = selectedConstituency;
+  //console.log("SELECTED:", c);
+  const winnerVotes = c.winner_votes ?? c.votes?.winner ?? 0;
+  const runnerVotes = c.runner_votes ?? c.votes?.runner_up?.votes ?? 0;
+  const runnerName = c.runner_name ?? c.votes?.runner_up?.name ?? "Runner-up";
+  const runnerParty = c.runner_party ?? c.votes?.runner_up?.party ?? "";
   const partyColor = getPartyColor(c.party);
-  const winnerVotes  = c.votes?.winner || 0;
-  const runnerVotes  = c.votes?.runner_up?.votes || 0;
-  const othersVotes  = (c.votes?.others || []).reduce((s, o) => s + (o.votes || 0), 0);
-  const totalVotes   = winnerVotes + runnerVotes + othersVotes;
+  const others = c.votes?.others || [];
 
-  const topCandidates = [
-    { name: c.winner, party: c.party, votes: winnerVotes, fill: partyColor },
-    { name: c.votes?.runner_up?.name || 'Runner-up', party: c.votes?.runner_up?.party || '', votes: runnerVotes, fill: getPartyColor(c.votes?.runner_up?.party) },
-    ...(c.votes?.others?.slice(0, 4).map(o => ({ name: o.name, party: '', votes: o.votes || 0, fill: '#6B7280' })) || []),
-  ].filter(item => item.votes > 0);
+  const candidates = [
+	{
+	  name: c.winner || "",
+	  party: c.party || "",
+	  votes: winnerVotes,
+	  fill: getPartyColor(c.party),
+	},
+	{
+	  name: runnerName,
+	  party: runnerParty,
+	  votes: runnerVotes,
+	  fill: getPartyColor(runnerParty),
+	},
+	...others.map((o) => ({
+	  name: o.name,
+	  party: "",
+	  votes: o.votes || 0,
+	  fill: "#6B7280",
+	})),
+  ];
 
-  const margin   = c.margin || (winnerVotes - runnerVotes);
-  const winShare = totalVotes > 0 ? ((winnerVotes / totalVotes) * 100).toFixed(1) : '0.0';
+  const topCandidates = candidates.filter((item) => item.votes > 0).sort((a, b) => b.votes - a.votes).slice(0, 6);
+  const othersVotes = others.reduce((s, o) => s + (o.votes || 0), 0);
+  const totalVotes = winnerVotes + runnerVotes + othersVotes;
+  const margin = c.margin ?? (winnerVotes - runnerVotes);
+  const winShare = totalVotes > 0 ? ((winnerVotes / totalVotes) * 100).toFixed(1) : "0.0";
   
   return (
     <div
@@ -54,7 +76,7 @@ export default function ConstituencyModal() {
           <div>
             <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{c.name_en}</div>
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <MapPin size={13} /> {c.district_en} · Constituency #{c.id}
+              <MapPin size={13} /> {c.district_en} · {t('Constituency', 'தொகுதி')} #{c.id}
             </div>
           </div>
           <button
@@ -71,16 +93,22 @@ export default function ConstituencyModal() {
           <div style={{ background: `${partyColor}18`, border: `1px solid ${partyColor}50`, borderRadius: '14px', padding: '18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <Award size={18} color={partyColor} />
-              <span style={{ fontWeight: 700, color: partyColor, fontSize: '14px' }}>{t('Winner', 'வெற்றியாளர்')}</span>
-              <span className="badge" style={{ background: `${partyColor}25`, color: partyColor, border: `1px solid ${partyColor}50`, marginLeft: 'auto' }}>{c.party}</span>
+              <span style={{ fontWeight: 700, color: partyColor, fontSize: '14px' }}>
+			  {ELECTION_CONFIG[year]?.status == 'final' 
+				? t('Winner', 'வெற்றியாளர்')
+				: t('Leading', 'முன்னணி ')}
+			  </span>
+              {c.party && (<span className="badge" style={{ background: `${partyColor}25`, color: partyColor, border: `1px solid ${partyColor}50`, marginLeft: 'auto' }}>
+				{getPartyDisplayName(c.party, lang)}
+			  </span>)}
             </div>
             <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{c.winner}</div>
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '3px' }}>
-              {getPartyName(c.party, lang) || c.party}
+              {getPartyDisplayName(c.party, lang)}
             </div>
             {/* Stats row */}
             <div style={{ display: 'flex', gap: '20px', marginTop: '14px', flexWrap: 'wrap' }}>
-              <StatMini label={t('Votes', 'வாக்குகள்')} value={winnerVotes.toLocaleString()} color={partyColor} />
+              <StatMini label={t('Votes', 'வாக்குகள்')} value={c.winner_votes} color={partyColor} />
               <StatMini label={t('Vote Share', 'வாக்கு பங்கு')} value={`${winShare}%`} color="#3b82f6" />
               <StatMini label={t('Margin', 'இடைவெளி')} value={`+${margin.toLocaleString()}`} color="#22c55e" />
               <StatMini label={t('Total Votes', 'மொத்தம்')} value={totalVotes.toLocaleString()} color="var(--text-muted)" />

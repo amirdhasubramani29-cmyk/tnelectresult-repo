@@ -61,12 +61,12 @@ export default function Footer() {
               <div>🗳️ 234 {t('Constituencies', 'தொகுதிகள்')}</div>
               <div>🏛️ {t('Tamil Nadu Assembly 2021', 'தமிழ்நாடு சட்டமன்றம் 2021')}</div>
               <div>📍 {t(' All Districts', ' அனைத்து மாவட்டங்கள்')}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {/* <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <ExternalLink size={12} />
                 <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
                   {t('Source: Election Commission of India', 'ஆதாரம்: இந்திய தேர்தல் ஆணையம்')}
                 </span>
-              </div>
+              </div>*/}
             </div>
           </div>
 
@@ -87,7 +87,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-            © 2026 Election Dashboard · {t('Made with', 'உருவாக்கியது')} ❤️ · {t('Data: ECI', 'தரவு: ECI')}
+            © 2026 Election Dashboard · {t('Made with', 'உருவாக்கியது')} ❤️ · {/*t('Data: ECI', 'தரவு: ECI')*/}
           </span>
           <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
             {t('For public awareness only', 'பொது விழிப்புணர்விற்காக மட்டுமே')}

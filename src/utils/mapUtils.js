@@ -64,6 +64,7 @@ export function groupByDistrict(data) {
 
     data.forEach((item) => {
         const district = normalize(item.districtKey);
+		//console.log('groupByDistrict districtKey is: ' + district);
         if (!district) return;
 
         if (!result[district]) {
@@ -71,6 +72,7 @@ export function groupByDistrict(data) {
         }
 
         result[district].push({
+			districtKey: item.districtKey,
             districtDisplay: item.districtDisplay,
             name: item.nameDisplay,
             name_ta: item.name_ta,

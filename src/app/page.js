@@ -12,19 +12,23 @@ export default function HomePage() {
   const [dataByYear, setDataByYear] = useState({});
   
   useEffect(() => {
-    const loadAll = async () => {
-		const results = await Promise.all(
-		  visibleYears.map((y) => getElectionData(y, lang))
-		);
+	setDataByYear({});
+    const unsubscribes = [];
+   
+    visibleYears.forEach((y) => {
+      const unsubscribe = getElectionData(y, lang, (result) => {
+        setDataByYear((prev) => ({
+          ...prev,
+          [y]: result,
+        }));
+      });
 
-		const mapped = {};
-		visibleYears.forEach((y, i) => {
-		  mapped[y] = results[i];
-		});
+      unsubscribes.push(unsubscribe);
+    });
 
-		setDataByYear(mapped);
-	};
-	loadAll();
+    return () => {
+      unsubscribes.forEach((fn) => fn && fn());
+    };
   }, [lang]);
   
   const topPartiesByYear = useMemo(() => {
@@ -37,7 +41,7 @@ export default function HomePage() {
       }
 
       const summary = getPartySummary(data.constituencies);
-      result[year] = summary.slice(0, 4);
+      result[year] = summary.filter(p => p.party?.toLowerCase() !== "unknown").slice(0, 4);
     });
 
     return result;

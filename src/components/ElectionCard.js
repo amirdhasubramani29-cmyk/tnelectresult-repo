@@ -1,9 +1,12 @@
 import Link from 'next/link';
+import { useApp } from '@/context/AppContext';
 import { ArrowRight } from 'lucide-react';
 import { getPartyColor } from '@/data/elections';
 import { ELECTION_CONFIG } from "@/config/electionConfig";
+import { getPartyDisplayName } from '@/utils/dataAdapter';
 
 const ElectionCard = ({ year, topParties, t }) => {
+  const { lang } = useApp();
   const status = ELECTION_CONFIG[year]?.status;
   return (
     <Link href={`/tn/${year}`} style={{ textDecoration: "none" }}>
@@ -74,7 +77,7 @@ const ElectionCard = ({ year, topParties, t }) => {
                 border: `1px solid ${getPartyColor(party)}40`,
               }}
             >
-              {party} {seats}
+              {getPartyDisplayName(party, lang)} {seats}
             </span>
           ))}
         </div>
