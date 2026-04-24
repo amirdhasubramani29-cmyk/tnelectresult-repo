@@ -13,6 +13,15 @@ const notoTamil = Noto_Sans_Tamil({ subsets: ["tamil"], variable: '--font-tamil'
 export const metadata = {
   title: "தமிழ்நாடு தேர்தல் முடிவுகள் | Tamil Nadu Election Results",
   description: "Comprehensive Tamil Nadu Assembly Election 2021 Results - All 234 constituencies with vote share, margins, and party-wise analysis.",
+   
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  alternates: {
+    canonical: "https://tnelectionresults.site",
+  },
 };
 
 export default function RootLayout({ children }) {

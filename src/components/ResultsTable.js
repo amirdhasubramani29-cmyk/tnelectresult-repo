@@ -12,6 +12,8 @@ export default function ResultsTable() {
   const { t, lang, year, search, setSearch, filterParty, sortBy, setSelectedConstituency } = useApp();
   const [page, setPage] = useState(1);
   const [data, setData] = useState(null);
+  
+  const formatIN = (num) => Number(num || 0).toLocaleString("en-IN");
 
   // Reset page when filters change
   useEffect(() => { setPage(1); }, [search, filterParty, sortBy, lang]);
@@ -126,10 +128,10 @@ export default function ResultsTable() {
                     </span>)}
                   </td>
                   <td style={{ padding: '11px 16px', fontSize: '13px', fontWeight: 700, color: partyColor }}>
-                    {(c.winner_votes || 0).toLocaleString()}
+                    {formatIN(c.winner_votes)}
                   </td>
                   <td style={{ padding: '11px 16px', fontSize: '13px', color: 'var(--text-muted)' }}>
-                    {(c.runner_votes || 0).toLocaleString()}
+                    {formatIN(c.runner_votes)}
                   </td>
                   <td style={{ padding: '11px 16px' }}>
                     <span style={{ fontSize: '13px', fontWeight: 700, color: marginColor }}>

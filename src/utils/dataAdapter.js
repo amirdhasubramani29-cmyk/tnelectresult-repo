@@ -2,16 +2,16 @@ import { normalize } from './mapUtils';
 
 // EN party keys → display names by language
 const partyDisplayMap = {
-  DMK:  { ta: 'திமுக',    en: 'DMK'  },
-  ADMK: { ta: 'அதிமுக',   en: 'ADMK' },
-  INC:  { ta: 'காங்கிரஸ்', en: 'INC'  },
-  BJP:  { ta: 'பாஜக',  en: 'BJP'  },
-  VCK:  { ta: 'விசிக',    en: 'VCK'  },
-  PMK:  { ta: 'பாமக',    en: 'PMK'  },
-  CPM:  { ta: 'மார்க்சிஸ்ட்', en: 'CPM' },
-  CPI:  { ta: 'கம்யூனிஸ்ட்',  en: 'CPI' },
-  AMMK: { ta: 'அமமுக',  en: 'AMMK' },
-  TVK:  { ta: 'தவெக',  en: 'TVK' },
+  DMK:  { ta: 'திமுக',		en: 'DMK'  },
+  ADMK: { ta: 'அதிமுக',   	en: 'ADMK' },
+  INC:  { ta: 'காங்', 		en: 'INC'  },
+  BJP:  { ta: 'பாஜக',  	en: 'BJP'  },
+  VCK:  { ta: 'விசிக',    	en: 'VCK'  },
+  PMK:  { ta: 'பாமக',    	en: 'PMK'  },
+  CPM:  { ta: 'சிபிஎம்', 	en: 'CPM'  },
+  CPI:  { ta: 'சிபிஐ',  	en: 'CPI'  },
+  AMMK: { ta: 'அமமுக', 	en: 'AMMK' },
+  TVK:  { ta: 'தவெக',  	en: 'TVK'  }, 
 };
 
 export function getPartyDisplayName(party, lang) {
