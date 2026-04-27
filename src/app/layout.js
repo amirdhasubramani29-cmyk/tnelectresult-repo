@@ -12,8 +12,10 @@ const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const notoTamil = Noto_Sans_Tamil({ subsets: ["tamil"], variable: '--font-tamil', weight: ['400','500','600','700'] });
 
 export const metadata = {
-  title: "தமிழ்நாடு தேர்தல் முடிவுகள் | Tamil Nadu Election Results",
-  description: "Comprehensive Tamil Nadu Assembly Election 2021 Results - All 234 constituencies with vote share, margins, and party-wise analysis.",
+  title:
+    "TN Election Results 2026 Tamil | தமிழ்நாடு தேர்தல் முடிவுகள் 2026 (Live)",
+  description:
+    "தமிழ்நாடு தேர்தல் முடிவுகள் 2026 - தொகுதி வாரியாக முடிவுகள், வாக்கு எண்ணிக்கை, முன்னிலை, வெற்றி பெற்றவர்கள். TN Election Results 2026 Tamil live updates.",
    
   robots: {
     index: true,

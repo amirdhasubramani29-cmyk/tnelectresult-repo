@@ -14,6 +14,7 @@ export default function ResultsTable() {
   const [data, setData] = useState(null);
   
   const formatIN = (num) => Number(num || 0).toLocaleString("en-IN");
+  const formatName = (str) => str?.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 
   // Reset page when filters change
   useEffect(() => { setPage(1); }, [search, filterParty, sortBy, lang]);
@@ -115,13 +116,13 @@ export default function ResultsTable() {
                   <td style={{ padding: '11px 16px', fontSize: '12px', color: 'var(--text-muted)' }}>{c.id}</td>
                   <td style={{ padding: '11px 16px' }}>
                     <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-primary)' }}>
-                      {c.nameDisplay}
+                      {formatName(c.nameDisplay)}
                     </div>                    
                   </td>
                   <td style={{ padding: '11px 16px', fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-                      {c.districtDisplay}
+                      {formatName(c.districtDisplay)}
                   </td>
-                  <td style={{ padding: '11px 16px', fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>{c.winner}</td>
+                  <td style={{ padding: '11px 16px', fontSize: '13px', color: 'var(--text-primary)', fontWeight: 500 }}>{formatName(c.winner)}</td>
                   <td style={{ padding: '11px 16px' }}>
                     {partyName && (<span className="badge" style={{ background: `${partyColor}20`, color: partyColor, border: `1px solid ${partyColor}50` }}>
                       {partyName}

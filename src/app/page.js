@@ -66,6 +66,18 @@ export default function HomePage() {
               {t('Results Dashboard', 'முடிவுகள் தளம்')}
           </span>
         </h1>
+		
+		<h2 style={{ fontSize: '16px', color: 'var(--text-secondary)', marginTop: '8px', fontWeight: 500 }}>
+		  {t(
+			"TN Election Results 2026 Tamil | Live Constituency Results",
+			"தமிழ்நாடு தேர்தல் முடிவுகள் 2026 - தொகுதி வாரியாக நேரடி முடிவுகள்."
+		  )}
+		</h2>
+		
+		<p style={{ display: 'none' }}>
+		  தமிழ்நாடு தேர்தல் முடிவுகள் 2026, TN election results Tamil,
+		  constituency-wise results Tamil Nadu.
+		</p>
 
         <p style={{ fontSize: '17px', color: 'var(--text-secondary)', maxWidth: '580px', margin: '0 auto 32px', lineHeight: 1.7 }}>
           {t(

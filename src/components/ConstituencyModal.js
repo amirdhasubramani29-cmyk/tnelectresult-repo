@@ -13,6 +13,7 @@ export default function ConstituencyModal() {
   const { selectedConstituency, setSelectedConstituency, t, lang, year } = useApp();
   
   const formatIN = (num) => Number(num || 0).toLocaleString("en-IN");
+  const formatName = (str) => str?.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
   
   useEffect(() => {
     if (selectedConstituency) {
@@ -29,7 +30,7 @@ export default function ConstituencyModal() {
   if (!selectedConstituency) return null;
 
   const c = selectedConstituency;
-  //console.log("SELECTED:", c);
+  console.log("SELECTED:", c);
   const winnerVotes = c.winner_votes ?? c.votes?.winner ?? 0;
   const runnerVotes = c.runner_votes ?? c.votes?.runner_up?.votes ?? 0;
   const runnerName = c.runner_name ?? c.votes?.runner_up?.name ?? "Runner-up";
@@ -89,9 +90,9 @@ export default function ConstituencyModal() {
         {/* Modal Header */}
         <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{c.name_en}</div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{c.nameDisplay}</div>
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <MapPin size={13} /> {c.district_en} · {t('Constituency', 'தொகுதி')} #{c.id}
+              <MapPin size={13} /> {c.district_en} · {t('Constituency', 'தொகுதி')} #{c.id} - {formatName(c.districtDisplay)} {t('District', 'மாவட்டம்')}
             </div>
           </div>
           <button
@@ -117,7 +118,7 @@ export default function ConstituencyModal() {
 				{getPartyDisplayName(c.party, lang)}
 			  </span>)}
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{c.winner}</div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{formatName(c.winner)}</div>
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '3px' }}>
               {getPartyDisplayName(c.party, lang)}
             </div>
